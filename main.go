@@ -1,6 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 TEJIRI ODIASE <tejiriaustin123@gmail.com>
 */
 package main
 
