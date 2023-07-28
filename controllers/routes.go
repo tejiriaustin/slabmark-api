@@ -6,12 +6,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/response"
+	"github.com/tejiriaustin/slabmark-api/services"
 )
 
-func BuildRoutes(
+func AddRoutes(
 	ctx context.Context,
 	routerEngine *gin.Engine,
+	service services.IServiceInterface,
+	repo repository.IRepositoryInterface,
 ) {
 
 	//controllers := BuildNewController(ctx)
