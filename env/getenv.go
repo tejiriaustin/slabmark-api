@@ -1,17 +1,16 @@
 package env
 
 import (
-	"errors"
 	"os"
 )
 
 // MustGetEnv takes a key string and returns an error if it is not found, and a string value if otherwise
-func MustGetEnv(key string) (string, error) {
+func MustGetEnv(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		return "", errors.New("can't find environment variable: " + key)
+		panic("couldn't get environment variable: " + key)
 	}
-	return value, nil
+	return value
 }
 
 // GetEnv takes a key string and returns a string
