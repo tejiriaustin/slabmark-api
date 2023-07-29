@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+	"github.com/tejiriaustin/slabmark-api/env"
+)
 
 // apiCmd represents the api command
 var apiCmd = &cobra.Command{
@@ -27,4 +30,15 @@ func startApi(cmd *cobra.Command, args []string) {
 	// Start Database Connection
 
 	// Run the Server
+}
+
+func setApiEnvironment() *env.Environment {
+	staticEnvironment := env.NewEnvironment()
+
+	staticEnvironment.
+		SetEnv(env.EnvPort, env.GetEnv(env.EnvPort, "8080")).
+		SetEnv(env.MONGO_DSN, env.MustGetEnv(env.MONGO_DSN)).
+		SetEnv(env.REDIS_DSN, env.MustGetEnv(env.REDIS_DSN))
+
+	return staticEnvironment
 }
