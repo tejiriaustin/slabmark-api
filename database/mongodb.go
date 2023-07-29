@@ -13,6 +13,10 @@ type Client struct {
 	DB *mongo.Database
 }
 
+func NewMongoDbClient() *Client {
+	return &Client{}
+}
+
 type (
 	Database interface {
 		Disconnect(ctx context.Context) error
@@ -31,7 +35,7 @@ type (
 	}
 )
 
-func Connect(dsn, dbName string, opts ...*options.ClientOptions) (*Client, error) {
+func (c *Client) Connect(dsn, dbName string, opts ...*options.ClientOptions) (*Client, error) {
 	opts = append(opts, options.Client().ApplyURI(dsn))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -47,10 +51,11 @@ func Connect(dsn, dbName string, opts ...*options.ClientOptions) (*Client, error
 		return nil, err
 	}
 	database := mClient.Database(dbName)
-	return &Client{
-		DB: database,
-		c:  mClient,
-	}, nil
+
+	c.DB = database
+	c.c = mClient
+
+	return c, nil
 }
 
 var _ Database = &Client{}
