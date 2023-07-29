@@ -3,14 +3,14 @@ package database
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
+	"log"
 )
 
 type RedisClient struct {
 	rdb *redis.Client
 }
 
-func NewClient(dsn, password string, opts redis.Options) *RedisClient {
-
+func NewRedisClient(dsn, password string, opts redis.Options) *RedisClient {
 	redisDbClient := redis.NewClient(&redis.Options{
 		Network:               "",
 		Addr:                  dsn,
@@ -20,6 +20,11 @@ func NewClient(dsn, password string, opts redis.Options) *RedisClient {
 		ContextTimeoutEnabled: false,
 		TLSConfig:             nil,
 	})
+
+	if err := redisDbClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("Error connecting to redis: %v", err)
+		return nil
+	}
 
 	return &RedisClient{
 		rdb: redisDbClient,
