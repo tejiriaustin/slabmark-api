@@ -48,6 +48,7 @@ func startApi(cmd *cobra.Command, args []string) {
 	sc := services.NewService(config)
 
 	server.Start(ctx, sc, rc)
+
 }
 
 func setApiEnvironment() *env.Environment {
