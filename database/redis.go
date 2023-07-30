@@ -10,25 +10,21 @@ type RedisClient struct {
 	rdb *redis.Client
 }
 
-func NewRedisClient(dsn, password string, opts redis.Options) *RedisClient {
+func NewRedisClient(dsn, port string) (*RedisClient, error) {
 	redisDbClient := redis.NewClient(&redis.Options{
-		Network:               "",
-		Addr:                  dsn,
-		Username:              "",
-		Password:              password,
-		DB:                    0,
-		ContextTimeoutEnabled: false,
-		TLSConfig:             nil,
+		Network:   port,
+		Addr:      dsn,
+		TLSConfig: nil,
 	})
 
 	if err := redisDbClient.Ping(context.Background()).Err(); err != nil {
 		log.Fatalf("Error connecting to redis: %v", err)
-		return nil
+		return nil, err
 	}
 
 	return &RedisClient{
 		rdb: redisDbClient,
-	}
+	}, nil
 }
 
 func (rdb RedisClient) Set(ctx context.Context, key string, value interface{}) error {
@@ -41,4 +37,12 @@ func (rdb RedisClient) Get(ctx context.Context, key string) (string, error) {
 		return "", err
 	}
 	return val, nil
+}
+
+func (rdb RedisClient) Disconnect(ctx context.Context) error {
+	err := rdb.rdb.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
