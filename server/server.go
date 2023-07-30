@@ -16,8 +16,8 @@ import (
 
 func Start(
 	ctx context.Context,
-	service services.IServiceInterface,
-	repo repository.IRepositoryInterface,
+	service *services.Service,
+	repo *repository.Container,
 ) {
 
 	router := gin.New()

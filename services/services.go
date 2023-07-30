@@ -1,12 +1,19 @@
 package services
 
-import "context"
+import (
+	"github.com/tejiriaustin/slabmark-api/env"
+)
 
 type Service struct {
+	AccountsService AccountsServiceInterface
+	StoreService    StoreServiceInterface
+	LabService      LabServiceInterface
 }
 
-type IServiceInterface interface{}
-
-func NewService(ctx context.Context) IServiceInterface {
-	return &Service{}
+func NewService(conf *env.Environment) *Service {
+	return &Service{
+		AccountsService: NewAccountsService(conf),
+		StoreService:    NewStoreService(conf),
+		LabService:      NewLabService(conf),
+	}
 }

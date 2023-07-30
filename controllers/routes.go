@@ -14,8 +14,8 @@ import (
 func AddRoutes(
 	ctx context.Context,
 	routerEngine *gin.Engine,
-	service services.IServiceInterface,
-	repo repository.IRepositoryInterface,
+	service *services.Service,
+	repo *repository.Container,
 ) {
 
 	//controllers := BuildNewController(ctx)
