@@ -10,11 +10,13 @@ type RedisClient struct {
 	rdb *redis.Client
 }
 
-func NewRedisClient(dsn, port string) (*RedisClient, error) {
+func NewRedisClient(dsn, password, port string) (*RedisClient, error) {
+	log.Println(" connecting to redis database...")
+
 	redisDbClient := redis.NewClient(&redis.Options{
-		Network:   port,
-		Addr:      dsn,
-		TLSConfig: nil,
+		Password: password,
+		Addr:     dsn,
+		DB:       0,
 	})
 
 	if err := redisDbClient.Ping(context.Background()).Err(); err != nil {

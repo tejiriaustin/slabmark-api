@@ -35,7 +35,7 @@ func startApi(cmd *cobra.Command, args []string) {
 		_ = dbConn.Disconnect(context.TODO())
 	}()
 
-	redis, err := database.NewRedisClient(config.GetAsString(env.REDIS_DSN), config.GetAsString(env.REDIS_PORT))
+	redis, err := database.NewRedisClient(config.GetAsString(env.REDIS_DSN), config.GetAsString(env.REDIS_PASS), config.GetAsString(env.REDIS_PORT))
 	if err != nil {
 		panic("Couldn't connect to redis dsn: " + err.Error())
 	}
@@ -43,21 +43,23 @@ func startApi(cmd *cobra.Command, args []string) {
 		_ = redis.Disconnect(context.TODO())
 	}()
 
-	rc := repository.NewContainer(nil, config)
+	rc := repository.NewRepositoryContainer(dbConn)
 
-	sc := services.NewService(config)
+	sc := services.NewService(&config)
 
 	server.Start(ctx, sc, rc)
 
 }
 
-func setApiEnvironment() *env.Environment {
+func setApiEnvironment() env.Environment {
 	staticEnvironment := env.NewEnvironment()
 
 	staticEnvironment.
 		SetEnv(env.EnvPort, env.GetEnv(env.EnvPort, "8080")).
-		SetEnv(env.MONGO_DSN, env.MustGetEnv(env.MONGO_DSN)).
 		SetEnv(env.REDIS_DSN, env.MustGetEnv(env.REDIS_DSN)).
+		SetEnv(env.REDIS_PORT, env.MustGetEnv(env.REDIS_PORT)).
+		SetEnv(env.REDIS_PASS, env.MustGetEnv(env.REDIS_PASS)).
+		SetEnv(env.MONGO_DSN, env.MustGetEnv(env.MONGO_DSN)).
 		SetEnv(env.MONGO_DB_NAME, env.MustGetEnv(env.MONGO_DB_NAME))
 
 	return staticEnvironment

@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/tejiriaustin/slabmark-api/env"
+	"log"
 )
 
 type Service struct {
@@ -11,6 +12,7 @@ type Service struct {
 }
 
 func NewService(conf *env.Environment) *Service {
+	log.Println("Creating Service...")
 	return &Service{
 		AccountsService: NewAccountsService(conf),
 		StoreService:    NewStoreService(conf),

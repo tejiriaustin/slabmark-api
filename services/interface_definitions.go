@@ -7,7 +7,7 @@ import (
 )
 
 type AccountsServiceInterface interface {
-	SignInUser(ctx context.Context, input SignInInput, repo repository.Container) (*models.Account, error)
+	SignInUser(ctx context.Context, input CreateAccountInput, acctsRepo *repository.Repository[models.Account]) (*models.Account, error)
 }
 
 type StoreServiceInterface interface {
