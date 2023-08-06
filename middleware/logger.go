@@ -59,8 +59,3 @@ func structuredLogs(logger *zap.Logger) gin.HandlerFunc {
 		}
 	}
 }
-~
-~
-~
-~
-~

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
+	"github.com/tejiriaustin/slabmark-api/repository"
 )
 
 type AccountsService struct {
@@ -19,9 +20,11 @@ func NewAccountsService(conf *env.Environment) *AccountsService {
 type SignInInput struct {
 	FirstName string
 	LastName  string
+	Email     string
+	Phone     string
 	Password  string
 }
 
-func (s *AccountsService) SignInUser(ctx context.Context, input SignInInput) (*models.Account, error) {
+func (s *AccountsService) SignInUser(ctx context.Context, input SignInInput, repo *repository.Container) (*models.Account, error) {
 	return nil, nil
 }
