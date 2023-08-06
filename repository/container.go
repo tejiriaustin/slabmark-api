@@ -13,17 +13,23 @@ import (
 	"time"
 )
 
+const (
+	dbnamespace = "slabmark_api_db_cluster"
+)
+
 type Container struct {
 	AccountsRepo *Repository[models.Account]
 	LabsRepo     *Repository[models.LabReading]
 	StoreRepo    *Repository[models.StoreItem]
 }
 
-func NewRepositoryContainer(dbConn database.Client) *Container {
+func NewRepositoryContainer(dbConn *database.Client) *Container {
+	log.Println(" building repository container...")
+
 	return &Container{
-		AccountsRepo: NewRepository[models.Account](dbConn.GetCollection("accounts")),
-		LabsRepo:     NewRepository[models.LabReading](dbConn.GetCollection("accounts")),
-		StoreRepo:    NewRepository[models.StoreItem](dbConn.GetCollection("accounts")),
+		AccountsRepo: NewRepository[models.Account](dbConn.GetCollection(fmt.Sprintf("%v.accounts", dbnamespace))),
+		LabsRepo:     NewRepository[models.LabReading](dbConn.GetCollection(fmt.Sprintf("%v.labsrepo", dbnamespace))),
+		StoreRepo:    NewRepository[models.StoreItem](dbConn.GetCollection(fmt.Sprintf("%v.store", dbnamespace))),
 	}
 }
 
@@ -40,7 +46,7 @@ func (r *Repository[T]) Create(ctx context.Context, data T) (T, error) {
 
 	res, err := r.dbCollection.InsertOne(ctx, data)
 	if err != nil {
-		return nil, errors.New("failed to insert one")
+		return data, errors.New("failed to insert one")
 	}
 	data.SetID(res.InsertedID.(primitive.ObjectID))
 	return data, nil
@@ -58,20 +64,20 @@ func (r *Repository[T]) FindOne(ctx context.Context, queryFilter *QueryFilter, p
 	err := r.dbCollection.FindOne(ctx, queryFilter.GetFilters(), findOneOptions...).Decode(data)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.New("no documents found")
+			return data, errors.New("no documents found")
 		}
-		return nil, errors.New("failed find One")
+		return data, errors.New("failed find One")
 	}
 	return data, nil
 }
 
 func (r *Repository[T]) Update(ctx context.Context, dataObject T) (T, error) {
 
-	if dataObject == nil {
-		return nil, errors.New("dataObject can't be nil")
-	}
+	//if dataObject == nil {
+	//	return dataObject, errors.New("dataObject can't be nil")
+	//}
 	if dataObject.DidUseProjection() {
-		return nil, errors.New("can't Update Document That Was Queried With A Projection - Some Fields May Be Lost")
+		return dataObject, errors.New("can't Update Document That Was Queried With A Projection - Some Fields May Be Lost")
 	}
 
 	dataObject.SetUpdatedAt()
@@ -79,7 +85,7 @@ func (r *Repository[T]) Update(ctx context.Context, dataObject T) (T, error) {
 	res := r.dbCollection.FindOneAndReplace(ctx, queryFilter.GetFilters(), dataObject)
 
 	if res.Err() != nil {
-		return nil, errors.New(fmt.Sprintf("Updated Failed with error: %s", res.Err()))
+		return dataObject, errors.New(fmt.Sprintf("Updated Failed with error: %s", res.Err()))
 	}
 
 	return dataObject, nil
@@ -90,7 +96,7 @@ func (r *Repository[T]) Update(ctx context.Context, dataObject T) (T, error) {
 // If projection is nil, all fields are returned.
 // sort should be a bson.D - eg: bson.D{bson.E{Key: "_id", Value: -1}, bson.E{Key: "another, Value: "value"}}
 // findPaginated will return the Mongo Cursor in the paginatedResult struct.
-func (r Repository[T]) findPaginated(ctx context.Context, pageOptions paginatorOptions, filters *QueryFilter, projection *QueryProjection, sort *QuerySort) (*paginatedResult, error) {
+func (r *Repository[T]) findPaginated(ctx context.Context, pageOptions paginatorOptions, filters *QueryFilter, projection *QueryProjection, sort *QuerySort) (*paginatedResult, error) {
 	if sort == nil {
 		sort = NewDefaultQuerySort()
 	}

@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 	"time"
 )
 
@@ -36,6 +37,7 @@ type (
 )
 
 func (c *Client) Connect(dsn, dbName string, opts ...*options.ClientOptions) (*Client, error) {
+	log.Println(" connecting to mongo database...")
 	opts = append(opts, options.Client().ApplyURI(dsn))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

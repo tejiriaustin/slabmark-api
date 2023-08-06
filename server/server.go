@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/tejiriaustin/slabmark-api/middleware"
 	"log"
 	"os"
 	"os/signal"
@@ -22,6 +23,7 @@ func Start(
 
 	router := gin.New()
 
+	router.Use(middleware.DefaultStructuredLogs())
 	log.Println("starting server...")
 
 	controllers.AddRoutes(ctx, router, service, repo)

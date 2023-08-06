@@ -17,7 +17,7 @@ func NewAccountsService(conf *env.Environment) *AccountsService {
 	}
 }
 
-type SignInInput struct {
+type CreateAccountInput struct {
 	FirstName string
 	LastName  string
 	Email     string
@@ -25,6 +25,23 @@ type SignInInput struct {
 	Password  string
 }
 
-func (s *AccountsService) SignInUser(ctx context.Context, input SignInInput, repo *repository.Container) (*models.Account, error) {
-	return nil, nil
+func (s *AccountsService) SignInUser(ctx context.Context,
+	input CreateAccountInput,
+	acctsRepo *repository.Repository[models.Account],
+) (*models.Account, error) {
+
+	account := models.Account{
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Phone:     input.Phone,
+		Email:     input.Email,
+		Kind:      "SLABMARK.ACCOUNT.KIND.ADMIN",
+		Status:    "ACTIVE",
+	}
+
+	_, err := acctsRepo.Create(ctx, account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
 }

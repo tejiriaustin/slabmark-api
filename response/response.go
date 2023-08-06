@@ -5,7 +5,6 @@ import (
 )
 
 type Response struct {
-	Code    int         `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Body    interface{} `json:"body,omitempty"`
 }
@@ -19,7 +18,6 @@ func FormatResponse(ctx *gin.Context, code int, message string, body interface{}
 	if body != nil {
 		response.Body = body
 	}
-	response.Code = code
 	response.Message = message
 
 	respond(ctx, code, response)

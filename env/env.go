@@ -12,9 +12,8 @@ func init() {
 	_ = godotenv.Load(".env")
 }
 
-func NewEnvironment() *Environment {
-	var env Environment
-	return &env
+func NewEnvironment() Environment {
+	return Environment{}
 }
 
 func (e Environment) SetEnv(name string, value interface{}) Environment {
