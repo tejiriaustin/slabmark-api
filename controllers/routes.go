@@ -15,14 +15,16 @@ func AddRoutes(
 	ctx context.Context,
 	routerEngine *gin.Engine,
 	service *services.Service,
-	repo *repository.Container,
+	repos *repository.Container,
 ) {
 
-	//controllers := BuildNewController(ctx)
+	controllers := BuildNewController(ctx)
 
 	r := routerEngine.Group("/v1")
 
 	r.GET("/health", func(c *gin.Context) {
 		response.FormatResponse(c, http.StatusOK, "OK", nil)
 	})
+
+	r.POST("/signup", controllers.AccountsController.SignUp(service.AccountsService, repos.AccountsRepo))
 }

@@ -3,10 +3,11 @@ package services
 import (
 	"context"
 	"github.com/tejiriaustin/slabmark-api/models"
+	"github.com/tejiriaustin/slabmark-api/repository"
 )
 
 type AccountsServiceInterface interface {
-	SignInUser(ctx context.Context, input SignInInput) (*models.Account, error)
+	SignInUser(ctx context.Context, input SignInInput, repo repository.Container) (*models.Account, error)
 }
 
 type StoreServiceInterface interface {
