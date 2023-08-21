@@ -48,4 +48,13 @@ type (
 		Filtration      models.Filtration      `json:"filtration" `
 		Loading         models.Loading         `json:"loading"`
 	}
+	UpdateFractionationRecordRequest struct {
+		ID              string                 `json:"id" bson:"id"`
+		ResumptionStock models.ResumptionStock `json:"resumption_stock"`
+		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
+		Filtration      models.Filtration      `json:"filtration" `
+		Loading         models.Loading         `json:"loading"`
+	}
+	ListFractionationRecordRequest struct {
+	}
 )

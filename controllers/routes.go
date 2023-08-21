@@ -45,7 +45,7 @@ func AddRoutes(
 	fractionation := r.Group("/fractionation")
 	{
 		fractionation.POST("", controllers.FractionationController.CreateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
-		fractionation.PUT("", controllers.FractionationController.EditFractionationRecord())
+		fractionation.PUT("", controllers.FractionationController.UpdateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
 		fractionation.GET("", controllers.FractionationController.GetFractionationRecord())
 		fractionation.GET("/list", controllers.FractionationController.GetFractionationRecord())
 	}

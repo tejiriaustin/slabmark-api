@@ -50,6 +50,24 @@ type (
 			input CreateFractionationRecordInput,
 			fractionationRepo *repository.Repository[models.FractionationReport],
 		) (*models.FractionationReport, error)
+
+		UpdateFractionationRecord(
+			ctx context.Context,
+			input UpdateFractionationRecordInput,
+			fractionationRepo *repository.Repository[models.FractionationReport],
+		) (*models.FractionationReport, error)
+
+		GetFractionationRecord(
+			ctx context.Context,
+			input GetFractionationRecordInput,
+			fractionationRepo *repository.Repository[models.FractionationReport],
+		) (*models.FractionationReport, error)
+
+		ListFractionationRecords(
+			ctx context.Context,
+			input ListFractionationReportsInput,
+			fractionationRepo *repository.Repository[models.FractionationReport],
+		) ([]models.FractionationReport, *repository.Paginator, error)
 	}
 
 	QualityControlServiceInterface interface {
