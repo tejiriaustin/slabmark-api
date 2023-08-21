@@ -1,11 +1,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/tejiriaustin/slabmark-api/constants"
-	"github.com/tejiriaustin/slabmark-api/response"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/tejiriaustin/slabmark-api/constants"
+	"github.com/tejiriaustin/slabmark-api/response"
 )
 
 func ReadPaginationOptions() gin.HandlerFunc {
