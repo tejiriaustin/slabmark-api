@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"github.com/tejiriaustin/slabmark-api/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +9,7 @@ import (
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/response"
 	"github.com/tejiriaustin/slabmark-api/services"
+	"github.com/tejiriaustin/slabmark-api/utils"
 )
 
 func AddRoutes(
