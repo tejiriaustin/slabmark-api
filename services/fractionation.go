@@ -4,23 +4,54 @@ import (
 	"context"
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
+	"github.com/tejiriaustin/slabmark-api/repository"
 )
 
-type LabService struct {
+type FractionationService struct {
 	conf *env.Environment
 }
 
-func NewLabService(conf *env.Environment) *LabService {
-	return &LabService{
+func NewFractionationService(conf *env.Environment) *FractionationService {
+	return &FractionationService{
 		conf: conf,
 	}
 }
 
-type AddDailyReadingInput struct {
-	ItemName string
-	Qty      int
-}
+type (
+	CreateFractionationRecordInput struct {
+		ResumptionStock models.ResumptionStock `json:"resumption_stock"`
+		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
+		Filtration      models.Filtration      `json:"filtration" `
+		Loading         models.Loading         `json:"loading"`
+	}
+	FractionationListFilters struct {
+		Query string // for partial or general lookups
+	}
+	ListFractionationReportsInput struct {
+		Pager
+		Projection *repository.QueryProjection
+		Sort       *repository.QuerySort
+		Filters    FractionationListFilters
+	}
+)
 
-func (s *LabService) AddDailyReading(ctx context.Context, input AddDailyReadingInput) (*models.LabReading, error) {
-	return nil, nil
+func (s *FractionationService) CreateFractionationRecord(
+	ctx context.Context,
+	input CreateFractionationRecordInput,
+	fractionationRepo *repository.Repository[models.FractionationReport],
+) (*models.FractionationReport, error) {
+
+	report := models.FractionationReport{
+		ResumptionStock: input.ResumptionStock,
+		ClosingStock:    input.ClosingStock,
+		Filtration:      input.Filtration,
+		Loading:         input.Loading,
+	}
+
+	report, err := fractionationRepo.Create(ctx, report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &report, nil
 }

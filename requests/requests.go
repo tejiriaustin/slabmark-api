@@ -1,5 +1,7 @@
 package requests
 
+import "github.com/tejiriaustin/slabmark-api/models"
+
 type (
 	CreateUserRequest struct {
 		FirstName string `json:"firstName"`
@@ -36,5 +38,14 @@ type (
 	ResetPasswordRequest struct {
 		ResetCode   string
 		NewPassword string
+	}
+)
+
+type (
+	CreateFractionationReportRequest struct {
+		ResumptionStock models.ResumptionStock `json:"resumption_stock"`
+		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
+		Filtration      models.Filtration      `json:"filtration" `
+		Loading         models.Loading         `json:"loading"`
 	}
 )

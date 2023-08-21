@@ -15,9 +15,14 @@ const (
 )
 
 var (
-	FieldAccountUsername = "username"
-	FieldAccountPassword = "password"
-	FieldAccountEmail    = "email"
+	FieldAccountId         = "_id"
+	FieldAccountUsername   = "username"
+	FieldAccountPassword   = "password"
+	FieldAccountPhone      = "phone"
+	FieldAccountEmail      = "email"
+	FieldAccountFirstName  = "first_name"
+	FieldAccountLastName   = "last_name"
+	FieldAccountDepartment = "department"
 )
 
 type (

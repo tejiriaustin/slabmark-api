@@ -28,6 +28,7 @@ type (
 		Department string
 	}
 	EditAccountInput struct {
+		Id         string
 		FirstName  string
 		LastName   string
 		Email      string
@@ -107,22 +108,29 @@ func (s *AccountsService) EditAccount(ctx context.Context,
 	fields := map[string]interface{}{}
 
 	if input.FirstName != "" {
-		fields["first_name"] = input.FirstName
+		fields[models.FieldAccountFirstName] = input.FirstName
 	}
 	if input.LastName != "" {
-		fields["last_name"] = input.LastName
+		fields[models.FieldAccountLastName] = input.LastName
 	}
 	if input.Email != "" {
-		fields["email"] = input.Email
+		fields[models.FieldAccountEmail] = input.Email
 	}
 	if input.Phone != "" {
-		fields["phone"] = input.Phone
+		fields[models.FieldAccountPhone] = input.Phone
 	}
 	if input.Department != "" {
-		fields["department"] = input.Department
+		fields[models.FieldAccountDepartment] = input.Department
+	}
+	updates := map[string]interface{}{
+		"$set": fields,
 	}
 
-	//TODO: implement DB update
+	filter := repository.NewQueryFilter().AddFilter(models.FieldAccountId, input.Id)
+	err := accountsRepo.UpdateMany(ctx, filter, updates)
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }
