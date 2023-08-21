@@ -5,6 +5,7 @@ import (
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FractionationService struct {
@@ -24,9 +25,23 @@ type (
 		Filtration      models.Filtration      `json:"filtration" `
 		Loading         models.Loading         `json:"loading"`
 	}
-	FractionationListFilters struct {
-		Query string // for partial or general lookups
+
+	UpdateFractionationRecordInput struct {
+		ID              string                 `json:"id"`
+		ResumptionStock models.ResumptionStock `json:"resumption_stock"`
+		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
+		Filtration      models.Filtration      `json:"filtration" `
+		Loading         models.Loading         `json:"loading"`
 	}
+
+	GetFractionationRecordInput struct {
+		ID string `json:"id"`
+	}
+
+	FractionationListFilters struct {
+		Query string // for partial free hand lookups
+	}
+
 	ListFractionationReportsInput struct {
 		Pager
 		Projection *repository.QueryProjection
@@ -54,4 +69,76 @@ func (s *FractionationService) CreateFractionationRecord(
 	}
 
 	return &report, nil
+}
+
+func (s *FractionationService) UpdateFractionationRecord(
+	ctx context.Context,
+	input UpdateFractionationRecordInput,
+	fractionationRepo *repository.Repository[models.FractionationReport],
+) (*models.FractionationReport, error) {
+
+	recordId, err := primitive.ObjectIDFromHex(input.ID)
+	if err != nil {
+		return nil, err
+	}
+	report := models.FractionationReport{
+		Shared: models.Shared{
+			ID: recordId,
+		},
+		ResumptionStock: input.ResumptionStock,
+		ClosingStock:    input.ClosingStock,
+		Filtration:      input.Filtration,
+		Loading:         input.Loading,
+	}
+
+	report, err = fractionationRepo.Update(ctx, report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &report, nil
+}
+
+func (s *FractionationService) GetFractionationRecord(
+	ctx context.Context,
+	input GetFractionationRecordInput,
+	fractionationRepo *repository.Repository[models.FractionationReport],
+) (*models.FractionationReport, error) {
+
+	filter := repository.
+		NewQueryFilter().
+		AddFilter(models.FieldAccountId, input.ID)
+
+	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &report, nil
+}
+
+func (s *FractionationService) ListFractionationRecords(
+	ctx context.Context,
+	input ListFractionationReportsInput,
+	fractionationRepo *repository.Repository[models.FractionationReport],
+) ([]models.FractionationReport, *repository.Paginator, error) {
+
+	filter := repository.NewQueryFilter()
+
+	if input.Filters.Query != "" {
+		freeHandFilters := []map[string]interface{}{
+			{"status": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"cr_batch_number": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"product": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+		}
+		filter.AddFilter("$or", freeHandFilters)
+	}
+
+	report, _, err := fractionationRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return report, nil, nil
 }

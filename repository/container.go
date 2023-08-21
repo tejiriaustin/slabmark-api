@@ -89,9 +89,6 @@ func (r *Repository[T]) FindOne(ctx context.Context, queryFilter *QueryFilter, p
 
 func (r *Repository[T]) Update(ctx context.Context, dataObject T) (T, error) {
 
-	//if dataObject == nil {
-	//	return dataObject, errors.New("dataObject can't be nil")
-	//}
 	if dataObject.DidUseProjection() {
 		return dataObject, errors.New("can't Update Document That Was Queried With A Projection - Some Fields May Be Lost")
 	}

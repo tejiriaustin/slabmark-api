@@ -18,8 +18,8 @@ type (
 		FastCooling string `json:"fast_cooling" bson:"fast_cooling"`
 	}
 	Batch struct {
-		BatchNumber     string `json:"batch_number" bson:"batch_number"`
 		NumberOfCycles  int    `json:"number_of_cycles" bson:"number_of_cycles"`
+		BatchNumber     string `json:"batch_number" bson:"batch_number"`
 		OleinQuantity   string `json:"olein_quantity" bson:"olein_quantity"`
 		OleinYield      string `json:"olein_yield" bson:"olein_yield"`
 		StearinQuantity string `json:"stearin_quantity" bson:"stearin_quantity"`
@@ -40,6 +40,7 @@ type (
 	}
 	FractionationReport struct {
 		Shared          `bson:",inline"`
+		Status          string          `json:"status" bson:"status"`
 		ResumptionStock ResumptionStock `Json:"resumption_stock" bson:"resumption_stock"`
 		ClosingStock    ClosingStock    `Json:"closing_stock" bson:"closing_stock"`
 		Filtration      Filtration      `json:"filtration" bson:"filtration"`
