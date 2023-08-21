@@ -14,6 +14,17 @@ const (
 	EmployeeAccountKind Kind = "SLABMARK.ACCOUNT.KIND.EMPLOYEE"
 )
 
+var (
+	FieldAccountId         = "_id"
+	FieldAccountUsername   = "username"
+	FieldAccountPassword   = "password"
+	FieldAccountPhone      = "phone"
+	FieldAccountEmail      = "email"
+	FieldAccountFirstName  = "first_name"
+	FieldAccountLastName   = "last_name"
+	FieldAccountDepartment = "department"
+)
+
 type (
 	Role struct {
 		Shared
@@ -21,15 +32,16 @@ type (
 	}
 
 	Account struct {
-		Shared
-		FirstName string `json:"first_name" bson:"first_name"`
-		LastName  string `json:"last_name" bson:"last_name"`
-		FullName  string `json:"full_name" bson:"full_name"`
-		Phone     string `json:"phone" bson:"phone"`
-		Email     string `json:"email" bson:"email"`
-		Kind      Kind   `json:"kind" bson:"kind"`
-		Role      Role   `json:"role" bson:"role"`
-		Status    Status `json:"status" bson:"status"`
+		Shared     `bson:",inline"`
+		Username   string `json:"username" bson:"username"`
+		FirstName  string `json:"first_name" bson:"first_name"`
+		LastName   string `json:"last_name" bson:"last_name"`
+		FullName   string `json:"full_name" bson:"full_name"`
+		Phone      string `json:"phone" bson:"phone"`
+		Email      string `json:"email" bson:"email"`
+		Department string `json:"department" bson:"department"`
+		Status     Status `json:"status" bson:"status"`
+		Password   string `json:"password" bson:"password"`
 	}
 )
 

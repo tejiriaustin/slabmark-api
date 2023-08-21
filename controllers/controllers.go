@@ -3,11 +3,17 @@ package controllers
 import "context"
 
 type Controller struct {
-	AccountsController *AccountsController
+	AccountsController       *AccountsController
+	QualityControlController *QualityControlController
+	FractionationController  *FractionationController
+	RefineryController       *RefineryController
 }
 
 func BuildNewController(ctx context.Context) *Controller {
 	return &Controller{
-		AccountsController: NewAccountController(),
+		AccountsController:       NewAccountController(),
+		QualityControlController: NewQualityControlController(),
+		FractionationController:  NewFractionationController(),
+		RefineryController:       NewRefineryController(),
 	}
 }
