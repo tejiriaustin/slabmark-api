@@ -46,15 +46,15 @@ func AddRoutes(
 	{
 		fractionation.POST("", controllers.FractionationController.CreateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
 		fractionation.PUT("", controllers.FractionationController.UpdateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
-		fractionation.GET("", controllers.FractionationController.GetFractionationRecord())
-		fractionation.GET("/list", controllers.FractionationController.GetFractionationRecord())
+		fractionation.GET("/:id", controllers.FractionationController.GetFractionationRecord(sc.FractionationService, repos.FractionationRepo))
+		fractionation.GET("/list", controllers.FractionationController.GetFractionationRecord(sc.FractionationService, repos.FractionationRepo))
 	}
 
 	refinery := r.Group("/refinery")
 	{
 		refinery.POST("", controllers.RefineryController.NewRefineryRecord())
 		refinery.PUT("", controllers.RefineryController.EditRefineryRecords())
-		refinery.GET("", controllers.RefineryController.GetRefineryRecord())
+		refinery.GET("/:id", controllers.RefineryController.GetRefineryRecord())
 		refinery.GET("/list", controllers.RefineryController.ListRefineryRecords())
 	}
 
@@ -62,7 +62,7 @@ func AddRoutes(
 	{
 		qualityControl.POST("", controllers.QualityControlController.NewQualityRecord())
 		qualityControl.PUT("", controllers.QualityControlController.EditQualityRecords())
-		qualityControl.GET("", controllers.QualityControlController.GetQualityRecord())
+		qualityControl.GET("/:id", controllers.QualityControlController.GetQualityRecord())
 		qualityControl.GET("/list", controllers.QualityControlController.ListQualityRecords())
 	}
 
