@@ -23,7 +23,10 @@ func Start(
 
 	router := gin.New()
 
-	router.Use(middleware.DefaultStructuredLogs())
+	router.Use(
+		middleware.DefaultStructuredLogs(),
+		middleware.ReadPaginationOptions(),
+	)
 	log.Println("starting server...")
 
 	controllers.AddRoutes(ctx, router, service, repo)

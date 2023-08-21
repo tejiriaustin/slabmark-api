@@ -1,14 +1,16 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/requests"
 	"github.com/tejiriaustin/slabmark-api/response"
 	"github.com/tejiriaustin/slabmark-api/services"
 	"github.com/tejiriaustin/slabmark-api/utils"
-	"net/http"
 )
 
 type AccountsController struct {

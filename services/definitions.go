@@ -45,8 +45,13 @@ type (
 		AddItem(ctx context.Context, input AddItemInput) (*models.StoreItem, error)
 	}
 	FractionationServiceInterface interface {
+		CreateFractionationRecord(
+			ctx context.Context,
+			input CreateFractionationRecordInput,
+			fractionationRepo *repository.Repository[models.FractionationReport],
+		) (*models.FractionationReport, error)
+	}
+
+	QualityControlServiceInterface interface {
 	}
 )
-type LabServiceInterface interface {
-	AddDailyReading(ctx context.Context, input AddDailyReadingInput) (*models.LabReading, error)
-}

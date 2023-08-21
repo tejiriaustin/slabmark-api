@@ -107,6 +107,15 @@ func (r *Repository[T]) Update(ctx context.Context, dataObject T) (T, error) {
 	return dataObject, nil
 }
 
+func (r *Repository[T]) UpdateMany(ctx context.Context, queryFilter *QueryFilter, opts map[string]interface{}) error {
+	_, err := r.dbCollection.UpdateMany(ctx, queryFilter.GetFilters(), opts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // findPaginated searches for document that matches the provided filters.
 // paginatorOptions control CurrentPage and PerPage value.
 // If projection is nil, all fields are returned.
