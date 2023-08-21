@@ -50,7 +50,7 @@ func AddRoutes(
 		fractionation.GET("/list", controllers.FractionationController.GetFractionationRecord())
 	}
 
-	refinery := r.Group("refinery")
+	refinery := r.Group("/refinery")
 	{
 		refinery.POST("", controllers.RefineryController.NewRefineryRecord())
 		refinery.PUT("", controllers.RefineryController.EditRefineryRecords())
@@ -58,7 +58,7 @@ func AddRoutes(
 		refinery.GET("/list", controllers.RefineryController.ListRefineryRecords())
 	}
 
-	qualityControl := r.Group("quality-control")
+	qualityControl := r.Group("/quality-control")
 	{
 		qualityControl.POST("", controllers.QualityControlController.NewQualityRecord())
 		qualityControl.PUT("", controllers.QualityControlController.EditQualityRecords())
