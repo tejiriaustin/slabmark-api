@@ -129,7 +129,7 @@ func (s *FractionationService) ListFractionationRecords(
 		freeHandFilters := []map[string]interface{}{
 			{"status": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 			{"cr_batch_number": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
-			{"product": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 		}
 		filter.AddFilter("$or", freeHandFilters)

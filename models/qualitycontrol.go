@@ -3,7 +3,7 @@ package models
 import "time"
 
 type (
-	HourlyReadings struct {
+	HourlyQualityReadings struct {
 		Shared        `bson:",inline"`
 		TimeOfReading *time.Time `json:"time" bson:"time"`
 		D4            string     `json:"d4" bson:"d4"`
@@ -12,7 +12,7 @@ type (
 		Remark        string     `json:"remark" bson:"remark"`
 	}
 
-	DailyReadings struct {
+	DailyQualityReadings struct {
 		Shared        `bson:",inline"`
 		ProductCode   string      `json:"product_code" bson:"product_code"`
 		OverallRemark string      `json:"overall_remark" bson:"overall_remark"`
