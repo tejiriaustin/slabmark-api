@@ -46,7 +46,7 @@ type (
 	}
 )
 
-func (s *FractionationService) CreateQualityRecord(
+func (s *QualityControlService) CreateQualityRecord(
 	ctx context.Context,
 	input CreateQualityRecordInput,
 	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
@@ -95,17 +95,17 @@ func (s *FractionationService) CreateQualityRecord(
 //	return &report, nil
 //}
 
-func (s *FractionationService) GetDailyQualityRecord(
+func (s *QualityControlService) GetDailyQualityRecord(
 	ctx context.Context,
 	input GetQualityRecordInput,
-	fractionationRepo *repository.Repository[models.DailyQualityReadings],
+	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 ) (*models.DailyQualityReadings, error) {
 
 	filter := repository.
 		NewQueryFilter().
 		AddFilter(models.FieldId, input.ID)
 
-	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
+	report, err := dailyQualityRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (s *FractionationService) GetDailyQualityRecord(
 	return &report, nil
 }
 
-func (s *FractionationService) ListQualityRecords(
+func (s *QualityControlService) ListQualityRecords(
 	ctx context.Context,
 	input ListQualityReportsInput,
 	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
