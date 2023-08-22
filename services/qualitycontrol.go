@@ -15,8 +15,10 @@ func NewQualityControlService() *QualityControlService {
 
 type (
 	CreateQualityRecordInput struct {
-		HourlyReadings []models.HourlyQualityReadings
-		DailyReadings  models.DailyQualityReadings
+		ProductCode    string                         `json:"product_code"`
+		OverallRemark  string                         `json:"overall_remark"`
+		AccountInfo    models.AccountInfo             `json:"account_info"`
+		HourlyReadings []models.HourlyQualityReadings `json:"hourly_readings"`
 	}
 
 	UpdateQualityRecordInput struct {
@@ -47,18 +49,17 @@ type (
 func (s *FractionationService) CreateQualityRecord(
 	ctx context.Context,
 	input CreateQualityRecordInput,
-	hourlyQualityRepo *repository.Repository[models.HourlyQualityReadings],
 	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 ) (*models.DailyQualityReadings, error) {
 
-	recordIds, err := hourlyQualityRepo.CreateMany(ctx, input.HourlyReadings)
-	if err != nil {
-		return nil, err
+	dailyReadings := models.DailyQualityReadings{
+		ProductCode:    input.ProductCode,
+		OverallRemark:  input.OverallRemark,
+		AccountInfo:    input.AccountInfo,
+		HourlyReadings: input.HourlyReadings,
 	}
 
-	input.DailyReadings.IdsOfReadings = recordIds
-
-	dailyQualityRecord, err := dailyQualityRepo.Create(ctx, input.DailyReadings)
+	dailyQualityRecord, err := dailyQualityRepo.Create(ctx, dailyReadings)
 	if err != nil {
 		return nil, err
 	}
@@ -96,33 +97,15 @@ func (s *FractionationService) CreateQualityRecord(
 
 func (s *FractionationService) GetDailyQualityRecord(
 	ctx context.Context,
-	input GetFractionationRecordInput,
+	input GetQualityRecordInput,
 	fractionationRepo *repository.Repository[models.DailyQualityReadings],
 ) (*models.DailyQualityReadings, error) {
 
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldAccountId, input.ID)
+		AddFilter(models.FieldId, input.ID)
 
 	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &report, nil
-}
-
-func (s *FractionationService) GetHourlyQualityRecord(
-	ctx context.Context,
-	input GetFractionationRecordInput,
-	hourlyQualityRepo *repository.Repository[models.HourlyQualityReadings],
-) (*models.HourlyQualityReadings, error) {
-
-	filter := repository.
-		NewQueryFilter().
-		AddFilter(models.FieldAccountId, input.ID)
-
-	report, err := hourlyQualityRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +116,7 @@ func (s *FractionationService) GetHourlyQualityRecord(
 func (s *FractionationService) ListQualityRecords(
 	ctx context.Context,
 	input ListQualityReportsInput,
-	fractionationRepo *repository.Repository[models.DailyQualityReadings],
+	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 ) ([]models.DailyQualityReadings, *repository.Paginator, error) {
 
 	filter := repository.NewQueryFilter()
@@ -150,7 +133,7 @@ func (s *FractionationService) ListQualityRecords(
 		filter.AddFilter("$or", freeHandFilters)
 	}
 
-	report, _, err := fractionationRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
+	report, _, err := dailyQualityRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -110,7 +110,6 @@ func (c *FractionationController) ListFractionationRecords(
 		}
 		response.FormatResponse(ctx, http.StatusOK, "successful", payload)
 		return
-
 	}
 }
 

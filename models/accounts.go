@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	FieldAccountId         = "_id"
+	FieldId                = "_id"
 	FieldAccountUsername   = "username"
 	FieldAccountPassword   = "password"
 	FieldAccountPhone      = "phone"

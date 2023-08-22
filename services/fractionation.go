@@ -107,7 +107,7 @@ func (s *FractionationService) GetFractionationRecord(
 
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldAccountId, input.ID)
+		AddFilter(models.FieldId, input.ID)
 
 	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
