@@ -22,8 +22,8 @@ type Container struct {
 	FractionationRepo     *Repository[models.FractionationReport]
 	HourlyRefineryReports *Repository[models.HourlyReport]
 	DailyRefineryRepo     *Repository[models.RefineryReport]
-	HourlyQualityReports  *Repository[models.HourlyReadings]
-	DailyQualityReports   *Repository[models.DailyReadings]
+	HourlyQualityReports  *Repository[models.HourlyQualityReadings]
+	DailyQualityReports   *Repository[models.DailyQualityReadings]
 	StoreRepo             *Repository[models.StoreItem]
 }
 
@@ -35,8 +35,8 @@ func NewRepositoryContainer(dbConn *database.Client) *Container {
 		FractionationRepo:     NewRepository[models.FractionationReport](dbConn.GetCollection(fmt.Sprintf("%v.fractionation_report", dbnamespace))),
 		HourlyRefineryReports: NewRepository[models.HourlyReport](dbConn.GetCollection(fmt.Sprintf("%v.hourly_refinery_report", dbnamespace))),
 		DailyRefineryRepo:     NewRepository[models.RefineryReport](dbConn.GetCollection(fmt.Sprintf("%v.daily_refinery_report", dbnamespace))),
-		HourlyQualityReports:  NewRepository[models.HourlyReadings](dbConn.GetCollection(fmt.Sprintf("%v.hourly_quality_report", dbnamespace))),
-		DailyQualityReports:   NewRepository[models.DailyReadings](dbConn.GetCollection(fmt.Sprintf("%v.daily_quality_reports", dbnamespace))),
+		HourlyQualityReports:  NewRepository[models.HourlyQualityReadings](dbConn.GetCollection(fmt.Sprintf("%v.hourly_quality_report", dbnamespace))),
+		DailyQualityReports:   NewRepository[models.DailyQualityReadings](dbConn.GetCollection(fmt.Sprintf("%v.daily_quality_reports", dbnamespace))),
 		StoreRepo:             NewRepository[models.StoreItem](dbConn.GetCollection(fmt.Sprintf("%v.store", dbnamespace))),
 	}
 }
@@ -58,6 +58,28 @@ func (r *Repository[T]) Create(ctx context.Context, data T) (T, error) {
 	}
 	data.SetID(res.InsertedID.(primitive.ObjectID))
 	return data, nil
+}
+
+func (r *Repository[T]) CreateMany(ctx context.Context, data []T) ([]string, error) {
+	var insert []interface{}
+
+	for _, t := range data {
+		t.Initialize(primitive.NewObjectID(), time.Now())
+		insert = append(insert, &t)
+	}
+
+	res, err := r.dbCollection.InsertMany(ctx, insert)
+	if err != nil {
+		return nil, errors.New("failed to insert one")
+	}
+
+	var ids []string
+	for _, v := range res.InsertedIDs {
+		id := v.(string)
+		ids = append(ids, id)
+	}
+	return ids, nil
+
 }
 
 func (r *Repository[T]) DeleteMany(ctx context.Context, queryFilter *QueryFilter) error {
