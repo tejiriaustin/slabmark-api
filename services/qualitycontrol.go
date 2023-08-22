@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type QualityControlService struct {
@@ -24,7 +23,7 @@ type (
 		ID              string                 `json:"id"`
 		ResumptionStock models.ResumptionStock `json:"resumption_stock"`
 		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
-		Filtration      models.Filtration      `json:"filtration" `
+		Filtration      models.Filtration      `json:"filtration"`
 		Loading         models.Loading         `json:"loading"`
 	}
 
@@ -33,14 +32,15 @@ type (
 	}
 
 	QualityListFilters struct {
-		Query string // for partial free hand lookups
+		Query       string // for partial free hand lookups
+		AccountInfo models.AccountInfo
 	}
 
 	ListQualityReportsInput struct {
 		Pager
 		Projection *repository.QueryProjection
 		Sort       *repository.QuerySort
-		Filters    FractionationListFilters
+		Filters    QualityListFilters
 	}
 )
 
@@ -66,33 +66,33 @@ func (s *FractionationService) CreateQualityRecord(
 	return &dailyQualityRecord, nil
 }
 
-func (s *FractionationService) UpdateQualityRecord(
-	ctx context.Context,
-	input UpdateFractionationRecordInput,
-	fractionationRepo *repository.Repository[models.FractionationReport],
-) (*models.FractionationReport, error) {
-
-	recordId, err := primitive.ObjectIDFromHex(input.ID)
-	if err != nil {
-		return nil, err
-	}
-	report := models.FractionationReport{
-		Shared: models.Shared{
-			ID: recordId,
-		},
-		ResumptionStock: input.ResumptionStock,
-		ClosingStock:    input.ClosingStock,
-		Filtration:      input.Filtration,
-		Loading:         input.Loading,
-	}
-
-	report, err = fractionationRepo.Update(ctx, report)
-	if err != nil {
-		return nil, err
-	}
-
-	return &report, nil
-}
+//func (s *FractionationService) UpdateQualityRecord(
+//	ctx context.Context,
+//	input UpdateFractionationRecordInput,
+//	fractionationRepo *repository.Repository[models.FractionationReport],
+//) (*models.FractionationReport, error) {
+//
+//	recordId, err := primitive.ObjectIDFromHex(input.ID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	report := models.FractionationReport{
+//		Shared: models.Shared{
+//			ID: recordId,
+//		},
+//		ResumptionStock: input.ResumptionStock,
+//		ClosingStock:    input.ClosingStock,
+//		Filtration:      input.Filtration,
+//		Loading:         input.Loading,
+//	}
+//
+//	report, err = fractionationRepo.Update(ctx, report)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &report, nil
+//}
 
 func (s *FractionationService) GetDailyQualityRecord(
 	ctx context.Context,
@@ -132,18 +132,20 @@ func (s *FractionationService) GetHourlyQualityRecord(
 
 func (s *FractionationService) ListQualityRecords(
 	ctx context.Context,
-	input ListFractionationReportsInput,
-	fractionationRepo *repository.Repository[models.FractionationReport],
-) ([]models.FractionationReport, *repository.Paginator, error) {
+	input ListQualityReportsInput,
+	fractionationRepo *repository.Repository[models.DailyQualityReadings],
+) ([]models.DailyQualityReadings, *repository.Paginator, error) {
 
 	filter := repository.NewQueryFilter()
 
 	if input.Filters.Query != "" {
 		freeHandFilters := []map[string]interface{}{
-			{"status": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
-			{"cr_batch_number": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
-			{"product": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
-			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"product_code": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"overall_remark": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"account_info.first_name": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"account_info.last_name": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"account_info.email": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"account_info.phone": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 		}
 		filter.AddFilter("$or", freeHandFilters)
 	}

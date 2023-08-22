@@ -71,5 +71,29 @@ type (
 	}
 
 	QualityControlServiceInterface interface {
+		CreateQualityRecord(
+			ctx context.Context,
+			input CreateQualityRecordInput,
+			hourlyQualityRepo *repository.Repository[models.HourlyQualityReadings],
+			dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
+		) (*models.DailyQualityReadings, error)
+
+		GetDailyQualityRecord(
+			ctx context.Context,
+			input GetFractionationRecordInput,
+			fractionationRepo *repository.Repository[models.DailyQualityReadings],
+		) (*models.DailyQualityReadings, error)
+
+		GetHourlyQualityRecord(
+			ctx context.Context,
+			input GetFractionationRecordInput,
+			hourlyQualityRepo *repository.Repository[models.HourlyQualityReadings],
+		) (*models.HourlyQualityReadings, error)
+
+		ListQualityRecords(
+			ctx context.Context,
+			input ListQualityReportsInput,
+			fractionationRepo *repository.Repository[models.DailyQualityReadings],
+		) ([]models.DailyQualityReadings, *repository.Paginator, error)
 	}
 )
