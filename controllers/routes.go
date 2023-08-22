@@ -60,7 +60,7 @@ func AddRoutes(
 
 	qualityControl := r.Group("/quality-control")
 	{
-		qualityControl.POST("", controllers.QualityControlController.NewQualityRecord())
+		qualityControl.POST("", controllers.QualityControlController.CreateQualityControlRecord())
 		qualityControl.PUT("", controllers.QualityControlController.EditQualityRecords())
 		qualityControl.GET("/:id", controllers.QualityControlController.GetQualityRecord())
 		qualityControl.GET("/list", controllers.QualityControlController.ListQualityRecords())

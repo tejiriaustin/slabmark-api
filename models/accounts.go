@@ -23,6 +23,7 @@ var (
 	FieldAccountFirstName  = "first_name"
 	FieldAccountLastName   = "last_name"
 	FieldAccountDepartment = "department"
+	FieldAccountInfoId     = "account_info.id"
 )
 
 type (
