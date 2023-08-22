@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/requests"
@@ -11,6 +12,7 @@ import (
 )
 
 type RefineryController struct {
+	conf *env.Environment
 }
 
 func NewRefineryController() *RefineryController {
@@ -22,9 +24,16 @@ func (c *RefineryController) CreateRefineryRecord(
 	refineryRepo *repository.Repository[models.RefineryReport],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		var requestBody requests.CreateRefineryRecordRequest
 
-		err := ctx.BindJSON(&requestBody)
+		err = ctx.BindJSON(&requestBody)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -58,6 +67,12 @@ func (c *RefineryController) GetRefineryRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		input := services.GetRefineryRecordInput{
 			ID: ctx.Param("id"),
 		}
@@ -79,6 +94,12 @@ func (c *RefineryController) ListRefineryRecords(
 	refineryRepo *repository.Repository[models.RefineryReport],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
 
 		input := services.ListRefineryReportsInput{
 			Pager: services.Pager{

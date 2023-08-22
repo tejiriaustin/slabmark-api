@@ -45,5 +45,6 @@ type (
 		ClosingStock    ClosingStock    `Json:"closing_stock" bson:"closing_stock"`
 		Filtration      Filtration      `json:"filtration" bson:"filtration"`
 		Loading         Loading         `json:"loading" bson:"loading"`
+		AccountInfo     *AccountInfo    `json:"account_info" bson:"account_info"`
 	}
 )

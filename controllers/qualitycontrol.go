@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/requests"
@@ -11,6 +12,7 @@ import (
 )
 
 type QualityControlController struct {
+	conf *env.Environment
 }
 
 func NewQualityControlController() *QualityControlController {
@@ -22,9 +24,16 @@ func (c *QualityControlController) CreateQualityControlRecord(
 	qcDailyRepo *repository.Repository[models.DailyQualityReadings],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		var requestBody requests.CreateQualityRecordRequest
 
-		err := ctx.BindJSON(&requestBody)
+		err = ctx.BindJSON(&requestBody)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -59,6 +68,12 @@ func (c *QualityControlController) GetQualityRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		input := services.GetQualityRecordInput{
 			ID: ctx.Param("id"),
 		}
@@ -79,6 +94,12 @@ func (c *QualityControlController) ListQualityRecords(
 	qcDailyRepo *repository.Repository[models.DailyQualityReadings],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
 
 		input := services.ListQualityReportsInput{
 			Pager: services.Pager{
