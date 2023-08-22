@@ -12,7 +12,7 @@ type FractionationService struct {
 	conf *env.Environment
 }
 
-func NewFractionationService(conf *env.Environment) *FractionationService {
+func NewFractionationService(conf *env.Environment) FractionationServiceInterface {
 	return &FractionationService{
 		conf: conf,
 	}

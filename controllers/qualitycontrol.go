@@ -19,7 +19,6 @@ func NewQualityControlController() *QualityControlController {
 
 func (c *QualityControlController) CreateQualityControlRecord(
 	qcService services.QualityControlServiceInterface,
-	qcHourlyRepo *repository.Repository[models.HourlyQualityReadings],
 	qcDailyRepo *repository.Repository[models.DailyQualityReadings],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -37,7 +36,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 			AccountInfo:    requestBody.AccountInfo,
 			HourlyReadings: requestBody.HourlyReadings,
 		}
-		record, err := qcService.CreateQualityRecord(ctx, input, qcHourlyRepo, qcDailyRepo)
+		record, err := qcService.CreateQualityRecord(ctx, input, qcDailyRepo)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -56,7 +55,6 @@ func (c *QualityControlController) EditQualityRecords() gin.HandlerFunc {
 
 func (c *QualityControlController) GetQualityRecord(
 	qcService services.QualityControlServiceInterface,
-	qcHourlyRepo *repository.Repository[models.HourlyQualityReadings],
 	qcDailyRepo *repository.Repository[models.DailyQualityReadings],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {

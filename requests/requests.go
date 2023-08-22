@@ -57,13 +57,16 @@ type (
 	}
 	ListFractionationRecordRequest struct {
 	}
-)
 
-type (
 	CreateQualityRecordRequest struct {
 		ProductCode    string                         `json:"product_code"`
 		OverallRemark  string                         `json:"overall_remark"`
 		AccountInfo    models.AccountInfo             `json:"account_info"`
 		HourlyReadings []models.HourlyQualityReadings `json:"hourly_readings"`
+	}
+
+	CreateRefineryRecordRequest struct {
+		PlantSituation string                `json:"plant_situation"`
+		HourlyReports  []models.HourlyReport `json:"hourly_reports"`
 	}
 )
