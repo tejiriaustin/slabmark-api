@@ -80,20 +80,20 @@ type (
 
 		GetDailyQualityRecord(
 			ctx context.Context,
-			input GetFractionationRecordInput,
+			input GetQualityRecordInput,
 			fractionationRepo *repository.Repository[models.DailyQualityReadings],
 		) (*models.DailyQualityReadings, error)
 
 		GetHourlyQualityRecord(
 			ctx context.Context,
-			input GetFractionationRecordInput,
+			input GetQualityRecordInput,
 			hourlyQualityRepo *repository.Repository[models.HourlyQualityReadings],
 		) (*models.HourlyQualityReadings, error)
 
 		ListQualityRecords(
 			ctx context.Context,
 			input ListQualityReportsInput,
-			fractionationRepo *repository.Repository[models.DailyQualityReadings],
+			dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 		) ([]models.DailyQualityReadings, *repository.Paginator, error)
 	}
 )

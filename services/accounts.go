@@ -126,7 +126,7 @@ func (s *AccountsService) EditAccount(ctx context.Context,
 		"$set": fields,
 	}
 
-	filter := repository.NewQueryFilter().AddFilter(models.FieldAccountId, input.Id)
+	filter := repository.NewQueryFilter().AddFilter(models.FieldId, input.Id)
 	err := accountsRepo.UpdateMany(ctx, filter, updates)
 	if err != nil {
 		return nil, err
