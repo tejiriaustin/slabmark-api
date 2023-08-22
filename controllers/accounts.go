@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/tejiriaustin/slabmark-api/env"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 )
 
 type AccountsController struct {
+	conf *env.Environment
 }
 
 func NewAccountController() *AccountsController {
@@ -77,6 +79,13 @@ func (c *AccountsController) Login(
 		}
 
 		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+	}
+}
+
+func (c *AccountsController) LogOut() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.SetCookie("auth", "", -1, "/", c.conf.GetAsString(env.FrontendUrl), false, true)
+		ctx.String(http.StatusOK, "Cookie has been deleted")
 	}
 }
 
@@ -160,9 +169,15 @@ func (c *AccountsController) AddAccount(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		var req requests.AddAccountRequest
 
-		err := ctx.BindJSON(&req)
+		err = ctx.BindJSON(&req)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -197,9 +212,15 @@ func (c *AccountsController) EditAccount(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		var req requests.EditAccountRequest
 
-		err := ctx.BindJSON(&req)
+		err = ctx.BindJSON(&req)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return

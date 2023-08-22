@@ -24,6 +24,7 @@ type (
 		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
 		Filtration      models.Filtration      `json:"filtration" `
 		Loading         models.Loading         `json:"loading"`
+		AccountInfo     *models.AccountInfo    `json:"account_info"`
 	}
 
 	UpdateFractionationRecordInput struct {
@@ -61,6 +62,7 @@ func (s *FractionationService) CreateFractionationRecord(
 		ClosingStock:    input.ClosingStock,
 		Filtration:      input.Filtration,
 		Loading:         input.Loading,
+		AccountInfo:     input.AccountInfo,
 	}
 
 	report, err := fractionationRepo.Create(ctx, report)

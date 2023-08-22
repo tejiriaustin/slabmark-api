@@ -3,15 +3,19 @@ package env
 const (
 	EnvPort = "PORT"
 
-	MONGO_DSN = "MONGO_DSN"
+	MongoDsn = "MONGO_DSN"
 
-	MONGO_DB_NAME = "MONGO_DB_NAME"
+	MongoDbName = "MONGO_DB_NAME"
 
-	REDIS_DSN = "REDIS_DSN"
+	RedisDsn = "REDIS_DSN"
 
-	REDIS_PASS = "REDIS_PASS"
+	RedisPass = "REDIS_PASS"
 
-	REDIS_PORT = "REDIS_PORT"
+	RedisPort = "REDIS_PORT"
+
+	FrontendUrl = "FRONTEND_URL"
+
+	JwtSecret = "JWT_SECRET"
 
 	REDIS_DB_NAME = "REDIS_DB_NAME"
 
