@@ -25,7 +25,7 @@ func (c *RefineryController) CreateRefineryRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -42,6 +42,7 @@ func (c *RefineryController) CreateRefineryRecord(
 		input := services.CreateRefineryInput{
 			PlantSituation: requestBody.PlantSituation,
 			HourlyReport:   requestBody.HourlyReports,
+			AccountInfo:    *accountInfo,
 		}
 
 		record, err := refineryService.CreateRefineryRecord(ctx, input, refineryRepo)

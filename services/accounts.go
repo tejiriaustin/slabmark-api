@@ -177,7 +177,7 @@ func (s *AccountsService) LoginUser(ctx context.Context,
 		LastName:   account.LastName,
 		FullName:   account.FullName,
 		Email:      account.Email,
-		Department: models.Role{},
+		Department: account.Department,
 	})
 	if err != nil {
 		return nil, errors.New("an error occurred")

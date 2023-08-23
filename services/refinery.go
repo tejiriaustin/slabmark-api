@@ -21,6 +21,7 @@ func NewRefineryService(conf *env.Environment) *RefineryService {
 type (
 	CreateRefineryInput struct {
 		PlantSituation string
+		AccountInfo    models.AccountInfo
 		HourlyReport   []models.HourlyReport
 	}
 
@@ -56,6 +57,7 @@ func (r *RefineryService) CreateRefineryRecord(
 	record := models.RefineryReport{
 		HourlyReports:  input.HourlyReport,
 		PlantSituation: input.PlantSituation,
+		AccountInfo:    input.AccountInfo,
 	}
 
 	record, err := refineryRepo.Create(ctx, record)

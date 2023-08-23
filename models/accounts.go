@@ -53,7 +53,7 @@ type AccountInfo struct {
 	LastName   string `json:"last_name" bson:"last_name"`
 	FullName   string `json:"full_name"`
 	Email      string `json:"email" bson:"email"`
-	Department Role   `json:"department" bson:"department"`
+	Department string `json:"department" bson:"department"`
 }
 type AccountInterface interface {
 	GetFullName() string
