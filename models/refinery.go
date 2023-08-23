@@ -12,7 +12,8 @@ type (
 	}
 	RefineryReport struct {
 		Shared         `bson:",inline"`
-		HourlyReports  []HourlyReport `json:"hourly_reports" bson:"hourly_reports"`
 		PlantSituation string         `json:"plant_situation" bson:"plant_situation"`
+		AccountInfo    AccountInfo    `json:"account_info" bson:"account_info"`
+		HourlyReports  []HourlyReport `json:"hourly_reports" bson:"hourly_reports"`
 	}
 )
