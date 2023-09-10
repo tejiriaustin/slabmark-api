@@ -12,7 +12,7 @@ type FractionationService struct {
 	conf *env.Environment
 }
 
-func NewFractionationService(conf *env.Environment) *FractionationService {
+func NewFractionationService(conf *env.Environment) FractionationServiceInterface {
 	return &FractionationService{
 		conf: conf,
 	}
@@ -24,6 +24,7 @@ type (
 		ClosingStock    models.ClosingStock    `Json:"closing_stock"`
 		Filtration      models.Filtration      `json:"filtration" `
 		Loading         models.Loading         `json:"loading"`
+		AccountInfo     *models.AccountInfo    `json:"account_info"`
 	}
 
 	UpdateFractionationRecordInput struct {
@@ -61,6 +62,7 @@ func (s *FractionationService) CreateFractionationRecord(
 		ClosingStock:    input.ClosingStock,
 		Filtration:      input.Filtration,
 		Loading:         input.Loading,
+		AccountInfo:     input.AccountInfo,
 	}
 
 	report, err := fractionationRepo.Create(ctx, report)
@@ -107,7 +109,7 @@ func (s *FractionationService) GetFractionationRecord(
 
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldAccountId, input.ID)
+		AddFilter(models.FieldId, input.ID)
 
 	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
@@ -129,7 +131,7 @@ func (s *FractionationService) ListFractionationRecords(
 		freeHandFilters := []map[string]interface{}{
 			{"status": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 			{"cr_batch_number": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
-			{"product": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 			{"reference": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
 		}
 		filter.AddFilter("$or", freeHandFilters)

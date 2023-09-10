@@ -2,10 +2,15 @@ package services
 
 import (
 	"context"
+	"errors"
+	"github.com/golang-jwt/jwt"
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/utils"
+	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type AccountsService struct {
@@ -77,6 +82,11 @@ func (s *AccountsService) AddAccount(ctx context.Context,
 
 	randPassword := passwordGen()
 
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(randPassword), 8)
+	if err != nil {
+		return nil, errors.New("couldn't generate password")
+	}
+
 	account := models.Account{
 		Username:   input.FirstName,
 		FirstName:  input.FirstName,
@@ -85,8 +95,10 @@ func (s *AccountsService) AddAccount(ctx context.Context,
 		Email:      input.Email,
 		Department: input.Department,
 		Status:     models.ActiveStatus,
-		Password:   randPassword,
+		Password:   string(passwordHash),
 	}
+
+	account.Username = account.GetUsername()
 
 	// TODO: send notification to email and whatsapp
 
@@ -126,7 +138,7 @@ func (s *AccountsService) EditAccount(ctx context.Context,
 		"$set": fields,
 	}
 
-	filter := repository.NewQueryFilter().AddFilter(models.FieldAccountId, input.Id)
+	filter := repository.NewQueryFilter().AddFilter(models.FieldId, input.Id)
 	err := accountsRepo.UpdateMany(ctx, filter, updates)
 	if err != nil {
 		return nil, err
@@ -140,18 +152,55 @@ func (s *AccountsService) LoginUser(ctx context.Context,
 	accountsRepo *repository.Repository[models.Account],
 ) (*models.Account, error) {
 
-	filter := repository.NewQueryFilter()
-
-	filter.
-		AddFilter(models.FieldAccountUsername, input.Username).
-		AddFilter(models.FieldAccountPassword, input.Password)
-
-	account, err := accountsRepo.FindOne(ctx, filter, nil, nil)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), 8)
 	if err != nil {
 		return nil, err
 	}
 
+	filter := repository.NewQueryFilter()
+
+	filter.
+		AddFilter(models.FieldAccountUsername, input.Username).
+		AddFilter(models.FieldAccountPassword, hashedPassword)
+
+	account, err := accountsRepo.FindOne(ctx, filter, nil, nil)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("incorrect login credentials")
+		}
+		return nil, errors.New("an error occurred")
+	}
+
+	token, err := s.generateAuthToken(ctx, models.AccountInfo{
+		Id:         account.ID.Hex(),
+		FirstName:  account.FirstName,
+		LastName:   account.LastName,
+		FullName:   account.FullName,
+		Email:      account.Email,
+		Department: account.Department,
+	})
+	if err != nil {
+		return nil, errors.New("an error occurred")
+	}
+
+	account.Token = token
 	return &account, nil
+}
+
+func (s *AccountsService) generateAuthToken(ctx context.Context, account models.AccountInfo) (string, error) {
+	token := jwt.New(jwt.SigningMethodEdDSA)
+
+	claims := token.Claims.(jwt.MapClaims)
+	claims["exp"] = time.Now().Add(3600 * time.Minute)
+	claims["authorized"] = true
+	claims["account_info"] = account
+
+	tokenString, err := token.SignedString(s.conf.GetAsString(env.JwtSecret))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 func (s *AccountsService) ForgotPassword(ctx context.Context,
