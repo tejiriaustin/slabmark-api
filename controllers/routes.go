@@ -52,18 +52,18 @@ func AddRoutes(
 
 	refinery := r.Group("/refinery")
 	{
-		refinery.POST("", controllers.RefineryController.NewRefineryRecord())
+		refinery.POST("", controllers.RefineryController.CreateRefineryRecord(sc.RefineryService, repos.RefineryRepo))
 		refinery.PUT("", controllers.RefineryController.EditRefineryRecords())
-		refinery.GET("/:id", controllers.RefineryController.GetRefineryRecord())
-		refinery.GET("/list", controllers.RefineryController.ListRefineryRecords())
+		refinery.GET("/:id", controllers.RefineryController.GetRefineryRecord(sc.RefineryService, repos.RefineryRepo))
+		refinery.GET("/list", controllers.RefineryController.ListRefineryRecords(sc.RefineryService, repos.RefineryRepo))
 	}
 
 	qualityControl := r.Group("/quality-control")
 	{
-		qualityControl.POST("", controllers.QualityControlController.NewQualityRecord())
+		qualityControl.POST("", controllers.QualityControlController.CreateQualityControlRecord(sc.QualityControlService, repos.QualityRepo))
 		qualityControl.PUT("", controllers.QualityControlController.EditQualityRecords())
-		qualityControl.GET("/:id", controllers.QualityControlController.GetQualityRecord())
-		qualityControl.GET("/list", controllers.QualityControlController.ListQualityRecords())
+		qualityControl.GET("/:id", controllers.QualityControlController.GetQualityRecord(sc.QualityControlService, repos.QualityRepo))
+		qualityControl.GET("/list", controllers.QualityControlController.ListQualityRecords(sc.QualityControlService, repos.QualityRepo))
 	}
 
 }

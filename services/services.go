@@ -12,7 +12,7 @@ type (
 	Service struct {
 		AccountsService       AccountsServiceInterface
 		DeptService           DepartmentsServiceInterface
-		StoreService          StoreServiceInterface
+		RefineryService       RefineryServiceInterface
 		FractionationService  FractionationServiceInterface
 		QualityControlService QualityControlServiceInterface
 		PasswordGenerator     utils.StrGenFunc
@@ -28,7 +28,6 @@ func NewService(conf *env.Environment) *Service {
 	log.Println("Creating Service...")
 	return &Service{
 		AccountsService:       NewAccountsService(conf),
-		StoreService:          NewStoreService(conf),
 		FractionationService:  NewFractionationService(conf),
 		QualityControlService: NewQualityControlService(),
 		DeptService:           NewDeptService(),

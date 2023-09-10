@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/tejiriaustin/slabmark-api/env"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 )
 
 type FractionationController struct {
+	conf *env.Environment
 }
 
 func NewFractionationController() *FractionationController {
@@ -27,7 +29,13 @@ func (c *FractionationController) CreateFractionationRecord(
 
 		var requestBody requests.CreateFractionationReportRequest
 
-		err := ctx.BindJSON(&requestBody)
+		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
+		err = ctx.BindJSON(&requestBody)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -38,6 +46,7 @@ func (c *FractionationController) CreateFractionationRecord(
 			ClosingStock:    requestBody.ClosingStock,
 			Filtration:      requestBody.Filtration,
 			Loading:         requestBody.Loading,
+			AccountInfo:     accountInfo,
 		}
 
 		record, err := fractionationService.CreateFractionationRecord(ctx, input, fractionationRepo)
@@ -58,7 +67,13 @@ func (c *FractionationController) UpdateFractionationRecord(
 	return func(ctx *gin.Context) {
 		var requestBody requests.UpdateFractionationRecordRequest
 
-		err := ctx.BindJSON(&requestBody)
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
+		err = ctx.BindJSON(&requestBody)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
 			return
@@ -88,6 +103,12 @@ func (c *FractionationController) ListFractionationRecords(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
 		input := services.ListFractionationReportsInput{
 			Pager: services.Pager{
 				Page:    services.GetPageNumberFromContext(ctx),
@@ -110,7 +131,6 @@ func (c *FractionationController) ListFractionationRecords(
 		}
 		response.FormatResponse(ctx, http.StatusOK, "successful", payload)
 		return
-
 	}
 }
 
@@ -119,6 +139,12 @@ func (c *FractionationController) GetFractionationRecord(
 	fractionationRepo *repository.Repository[models.FractionationReport],
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
 
 		input := services.GetFractionationRecordInput{
 			ID: ctx.Param("id"),

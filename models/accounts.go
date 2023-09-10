@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	FieldAccountId         = "_id"
+	FieldId                = "_id"
 	FieldAccountUsername   = "username"
 	FieldAccountPassword   = "password"
 	FieldAccountPhone      = "phone"
@@ -23,6 +23,7 @@ var (
 	FieldAccountFirstName  = "first_name"
 	FieldAccountLastName   = "last_name"
 	FieldAccountDepartment = "department"
+	FieldAccountInfoId     = "account_info.id"
 )
 
 type (
@@ -42,16 +43,17 @@ type (
 		Department string `json:"department" bson:"department"`
 		Status     Status `json:"status" bson:"status"`
 		Password   string `json:"password" bson:"password"`
+		Token      string `bson:"-"`
 	}
 )
 
 type AccountInfo struct {
-	Id        string `json:"id" bson:"id"`
-	FirstName string `json:"first_name" bson:"first_name"`
-	LastName  string `json:"last_name" bson:"last_name"`
-	FullName  string `json:"full_name"`
-	Kind      Kind   `json:"kind" bson:"kind"`
-	Role      Role   `json:"role" bson:"role"`
+	Id         string `json:"id" bson:"id"`
+	FirstName  string `json:"first_name" bson:"first_name"`
+	LastName   string `json:"last_name" bson:"last_name"`
+	FullName   string `json:"full_name"`
+	Email      string `json:"email" bson:"email"`
+	Department string `json:"department" bson:"department"`
 }
 type AccountInterface interface {
 	GetFullName() string
@@ -63,4 +65,8 @@ func NewAccount() AccountInterface {
 
 func (a Account) GetFullName() string {
 	return a.FirstName + " " + a.LastName
+}
+
+func (a Account) GetUsername() string {
+	return string(a.FirstName[0]) + a.LastName
 }

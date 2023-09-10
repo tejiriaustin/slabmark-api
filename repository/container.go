@@ -18,26 +18,20 @@ const (
 )
 
 type Container struct {
-	AccountsRepo          *Repository[models.Account]
-	FractionationRepo     *Repository[models.FractionationReport]
-	HourlyRefineryReports *Repository[models.HourlyReport]
-	DailyRefineryRepo     *Repository[models.RefineryReport]
-	HourlyQualityReports  *Repository[models.HourlyReadings]
-	DailyQualityReports   *Repository[models.DailyReadings]
-	StoreRepo             *Repository[models.StoreItem]
+	AccountsRepo      *Repository[models.Account]
+	FractionationRepo *Repository[models.FractionationReport]
+	RefineryRepo      *Repository[models.RefineryReport]
+	QualityRepo       *Repository[models.DailyQualityReadings]
 }
 
 func NewRepositoryContainer(dbConn *database.Client) *Container {
 	log.Println(" building repository container...")
 
 	return &Container{
-		AccountsRepo:          NewRepository[models.Account](dbConn.GetCollection(fmt.Sprintf("%v.accounts", dbnamespace))),
-		FractionationRepo:     NewRepository[models.FractionationReport](dbConn.GetCollection(fmt.Sprintf("%v.fractionation_report", dbnamespace))),
-		HourlyRefineryReports: NewRepository[models.HourlyReport](dbConn.GetCollection(fmt.Sprintf("%v.hourly_refinery_report", dbnamespace))),
-		DailyRefineryRepo:     NewRepository[models.RefineryReport](dbConn.GetCollection(fmt.Sprintf("%v.daily_refinery_report", dbnamespace))),
-		HourlyQualityReports:  NewRepository[models.HourlyReadings](dbConn.GetCollection(fmt.Sprintf("%v.hourly_quality_report", dbnamespace))),
-		DailyQualityReports:   NewRepository[models.DailyReadings](dbConn.GetCollection(fmt.Sprintf("%v.daily_quality_reports", dbnamespace))),
-		StoreRepo:             NewRepository[models.StoreItem](dbConn.GetCollection(fmt.Sprintf("%v.store", dbnamespace))),
+		AccountsRepo:      NewRepository[models.Account](dbConn.GetCollection(fmt.Sprintf("%v.accounts", dbnamespace))),
+		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection(fmt.Sprintf("%v.fractionation_report", dbnamespace))),
+		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection(fmt.Sprintf("%v.daily_refinery_report", dbnamespace))),
+		QualityRepo:       NewRepository[models.DailyQualityReadings](dbConn.GetCollection(fmt.Sprintf("%v.daily_quality_reports", dbnamespace))),
 	}
 }
 
