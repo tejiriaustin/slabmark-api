@@ -32,7 +32,7 @@ func (c *AccountsController) SignUp(
 
 		err := ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request", nil)
 			return
 		}
 
@@ -41,11 +41,12 @@ func (c *AccountsController) SignUp(
 			LastName:  req.LastName,
 			Email:     req.Email,
 			Phone:     req.Phone,
+			Password:  req.Phone,
 		}
 
-		user, err := acctService.SignInUser(ctx, input, accountsRepo)
+		user, err := acctService.CreateUser(ctx, input, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -74,7 +75,7 @@ func (c *AccountsController) Login(
 
 		user, err := acctService.LoginUser(ctx, input, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -109,7 +110,7 @@ func (c *AccountsController) ForgotPassword(
 
 		user, err := acctService.ForgotPassword(ctx, input, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -138,7 +139,7 @@ func (c *AccountsController) ResetPassword(
 
 		user, err := acctService.ResetPassword(ctx, input, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -153,7 +154,7 @@ func (c *AccountsController) GetRoles(
 
 		roles, err := rolesService.GetRoles()
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -197,7 +198,7 @@ func (c *AccountsController) AddAccount(
 
 		user, err := acctService.AddAccount(ctx, input, passwordGen, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -240,7 +241,7 @@ func (c *AccountsController) EditAccount(
 
 		user, err := acctService.EditAccount(ctx, input, accountsRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 2", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 

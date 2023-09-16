@@ -1,5 +1,7 @@
 package models
 
+import "strings"
+
 type (
 	Status string // Status of an account type
 
@@ -68,5 +70,5 @@ func (a Account) GetFullName() string {
 }
 
 func (a Account) GetUsername() string {
-	return string(a.FirstName[0]) + a.LastName
+	return string(a.FirstName[0]) + strings.ToLower(a.LastName)
 }

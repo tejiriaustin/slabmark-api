@@ -66,17 +66,17 @@ func (r *Repository[T]) FindOne(ctx context.Context, queryFilter *QueryFilter, p
 	var data T
 
 	opts := &options.FindOneOptions{}
-	if projection == nil {
+	if projection != nil {
 		opts.Projection = projection.GetProjection()
 		data.SetUsedProjection(true)
 	}
 
-	err := r.dbCollection.FindOne(ctx, queryFilter.GetFilters(), findOneOptions...).Decode(data)
+	err := r.dbCollection.FindOne(ctx, queryFilter.GetFilters(), findOneOptions...).Decode(&data)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return data, errors.New("no documents found")
+			return data, NoDocumentsFound
 		}
-		return data, errors.New("failed find One")
+		return data, errors.New("failed find One: " + err.Error())
 	}
 	return data, nil
 }

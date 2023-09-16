@@ -9,7 +9,7 @@ import (
 
 type (
 	AccountsServiceInterface interface {
-		SignInUser(ctx context.Context,
+		CreateUser(ctx context.Context,
 			input AddAccountInput,
 			accountsRepo *repository.Repository[models.Account],
 		) (*models.Account, error)

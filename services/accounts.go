@@ -8,6 +8,7 @@ import (
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -53,21 +54,42 @@ type (
 	}
 )
 
-func (s *AccountsService) SignInUser(ctx context.Context,
+func (s *AccountsService) CreateUser(ctx context.Context,
 	input AddAccountInput,
 	accountsRepo *repository.Repository[models.Account],
 ) (*models.Account, error) {
 
+	filters := []map[string]interface{}{
+		{"email": input.Email},
+		{"phone": input.Phone},
+	}
+
+	qf := repository.NewQueryFilter().AddFilter("$or", filters)
+	matchedUser, err := accountsRepo.FindOne(ctx, qf, nil, nil)
+	if err != nil && err != repository.NoDocumentsFound {
+		return nil, err
+	}
+	if matchedUser.Email == input.Email {
+		return nil, errors.New("user with this email already exists")
+	}
+	if matchedUser.Phone == input.Phone {
+		return nil, errors.New("user with this phone number already exists")
+	}
+
 	account := models.Account{
+		Shared: models.Shared{
+			ID: primitive.NewObjectID(),
+		},
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 		Phone:     input.Phone,
 		Email:     input.Email,
 		Status:    "ACTIVE",
-		Password:  "whimpy-boy",
+		Password:  input.Password,
 	}
-
-	_, err := accountsRepo.Create(ctx, account)
+	account.FullName = account.GetFullName()
+	account.Username = account.GetUsername()
+	_, err = accountsRepo.Create(ctx, account)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +101,23 @@ func (s *AccountsService) AddAccount(ctx context.Context,
 	passwordGen utils.StrGenFunc,
 	accountsRepo *repository.Repository[models.Account],
 ) (*models.Account, error) {
+
+	filters := []map[string]interface{}{
+		{"email": input.Email},
+		{"phone": input.Phone},
+	}
+
+	qf := repository.NewQueryFilter().AddFilter("$or", filters)
+	matchedUser, err := accountsRepo.FindOne(ctx, qf, nil, nil)
+	if err != nil && err != repository.NoDocumentsFound {
+		return nil, err
+	}
+	if matchedUser.Email == input.Email {
+		return nil, errors.New("user with this email already exists")
+	}
+	if matchedUser.Phone == input.Phone {
+		return nil, errors.New("user with this phone number already exists")
+	}
 
 	randPassword := passwordGen()
 
@@ -98,6 +137,7 @@ func (s *AccountsService) AddAccount(ctx context.Context,
 		Password:   string(passwordHash),
 	}
 
+	account.FullName = account.GetFullName()
 	account.Username = account.GetUsername()
 
 	// TODO: send notification to email and whatsapp
