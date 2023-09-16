@@ -20,7 +20,7 @@ type (
 	CreateQualityRecordInput struct {
 		ProductCode    string                         `json:"product_code"`
 		OverallRemark  string                         `json:"overall_remark"`
-		AccountInfo    models.AccountInfo             `json:"account_info"`
+		AccountInfo    *models.AccountInfo            `json:"account_info"`
 		HourlyReadings []models.HourlyQualityReadings `json:"hourly_readings"`
 	}
 
@@ -64,7 +64,7 @@ func (s *QualityControlService) CreateQualityRecord(
 		},
 		ProductCode:    input.ProductCode,
 		OverallRemark:  input.OverallRemark,
-		AccountInfo:    input.AccountInfo,
+		AccountInfo:    *input.AccountInfo,
 		HourlyReadings: input.HourlyReadings,
 	}
 

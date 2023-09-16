@@ -25,8 +25,8 @@ func NewRepositoryContainer(dbConn *database.Client) *Container {
 
 	return &Container{
 		AccountsRepo:      NewRepository[models.Account](dbConn.GetCollection("accounts")),
-		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection("fractionation_report")),
-		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection("daily_refinery_report")),
+		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection("fractionation_reports")),
+		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection("daily_refinery_reports")),
 		QualityRepo:       NewRepository[models.DailyQualityReadings](dbConn.GetCollection("daily_quality_reports")),
 	}
 }

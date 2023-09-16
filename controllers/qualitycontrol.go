@@ -27,7 +27,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
+		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -44,7 +44,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 		input := services.CreateQualityRecordInput{
 			ProductCode:    requestBody.ProductCode,
 			OverallRemark:  requestBody.OverallRemark,
-			AccountInfo:    requestBody.AccountInfo,
+			AccountInfo:    accountInfo,
 			HourlyReadings: requestBody.HourlyReadings,
 		}
 		record, err := qcService.CreateQualityRecord(ctx, input, qcDailyRepo)
