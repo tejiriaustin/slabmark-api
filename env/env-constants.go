@@ -15,7 +15,7 @@ const (
 
 	FrontendUrl = "FRONTEND_URL"
 
-	JwtSecret = "JWT_SECRET"
+	JwtSecret = "JWT_SECRET_KEY"
 
 	REDIS_DB_NAME = "REDIS_DB_NAME"
 

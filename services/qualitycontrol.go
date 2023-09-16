@@ -2,8 +2,11 @@ package services
 
 import (
 	"context"
+	"errors"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type QualityControlService struct {
@@ -52,7 +55,13 @@ func (s *QualityControlService) CreateQualityRecord(
 	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 ) (*models.DailyQualityReadings, error) {
 
+	now := time.Now()
+
 	dailyReadings := models.DailyQualityReadings{
+		Shared: models.Shared{
+			ID:        primitive.NewObjectID(),
+			CreatedAt: &now,
+		},
 		ProductCode:    input.ProductCode,
 		OverallRemark:  input.OverallRemark,
 		AccountInfo:    input.AccountInfo,
@@ -101,9 +110,14 @@ func (s *QualityControlService) GetDailyQualityRecord(
 	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
 ) (*models.DailyQualityReadings, error) {
 
+	id, err := primitive.ObjectIDFromHex(input.ID)
+	if err != nil {
+		return nil, errors.New("invalid identifier")
+	}
+
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldId, input.ID)
+		AddFilter(models.FieldId, id)
 
 	report, err := dailyQualityRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {

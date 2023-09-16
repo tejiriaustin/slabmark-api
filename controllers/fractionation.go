@@ -17,8 +17,10 @@ type FractionationController struct {
 	conf *env.Environment
 }
 
-func NewFractionationController() *FractionationController {
-	return &FractionationController{}
+func NewFractionationController(conf *env.Environment) *FractionationController {
+	return &FractionationController{
+		conf: conf,
+	}
 }
 
 func (c *FractionationController) CreateFractionationRecord(
@@ -29,15 +31,15 @@ func (c *FractionationController) CreateFractionationRecord(
 
 		var requestBody requests.CreateFractionationReportRequest
 
-		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			response.FormatResponse(ctx, http.StatusUnauthorized, "unauthorised access", nil)
 			return
 		}
 
 		err = ctx.BindJSON(&requestBody)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -51,7 +53,7 @@ func (c *FractionationController) CreateFractionationRecord(
 
 		record, err := fractionationService.CreateFractionationRecord(ctx, input, fractionationRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -67,7 +69,7 @@ func (c *FractionationController) UpdateFractionationRecord(
 	return func(ctx *gin.Context) {
 		var requestBody requests.UpdateFractionationRecordRequest
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -75,7 +77,7 @@ func (c *FractionationController) UpdateFractionationRecord(
 
 		err = ctx.BindJSON(&requestBody)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -88,7 +90,7 @@ func (c *FractionationController) UpdateFractionationRecord(
 
 		record, err := fractionationService.UpdateFractionationRecord(ctx, input, fractionationRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -103,7 +105,7 @@ func (c *FractionationController) ListFractionationRecords(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -115,13 +117,13 @@ func (c *FractionationController) ListFractionationRecords(
 				PerPage: services.GetPerPageLimitFromContext(ctx),
 			},
 			Filters: services.FractionationListFilters{
-				Query: ctx.Param("query"),
+				Query: ctx.Query("query"),
 			},
 		}
 
 		records, paginator, err := fractionationService.ListFractionationRecords(ctx, input, fractionationRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -140,7 +142,7 @@ func (c *FractionationController) GetFractionationRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -152,7 +154,7 @@ func (c *FractionationController) GetFractionationRecord(
 
 		record, err := fractionationService.GetFractionationRecord(ctx, input, fractionationRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 

@@ -13,10 +13,6 @@ import (
 	"time"
 )
 
-const (
-	dbnamespace = "slabmark_api_db_cluster"
-)
-
 type Container struct {
 	AccountsRepo      *Repository[models.Account]
 	FractionationRepo *Repository[models.FractionationReport]
@@ -28,10 +24,10 @@ func NewRepositoryContainer(dbConn *database.Client) *Container {
 	log.Println(" building repository container...")
 
 	return &Container{
-		AccountsRepo:      NewRepository[models.Account](dbConn.GetCollection(fmt.Sprintf("%v.accounts", dbnamespace))),
-		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection(fmt.Sprintf("%v.fractionation_report", dbnamespace))),
-		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection(fmt.Sprintf("%v.daily_refinery_report", dbnamespace))),
-		QualityRepo:       NewRepository[models.DailyQualityReadings](dbConn.GetCollection(fmt.Sprintf("%v.daily_quality_reports", dbnamespace))),
+		AccountsRepo:      NewRepository[models.Account](dbConn.GetCollection("accounts")),
+		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection("fractionation_report")),
+		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection("daily_refinery_report")),
+		QualityRepo:       NewRepository[models.DailyQualityReadings](dbConn.GetCollection("daily_quality_reports")),
 	}
 }
 

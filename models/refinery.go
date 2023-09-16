@@ -4,11 +4,11 @@ import "time"
 
 type (
 	HourlyReport struct {
-		TimeTake  *time.Time `json:"time_take" bson:"time_take"`
+		TakeTime  *time.Time `json:"take_time" bson:"take_time"`
 		FlowRate  string     `json:"flow_rate" bson:"flow_rate"`
 		FfaOfRbdo string     `json:"ffa_of_rbdo" bson:"ffa_of_rbdo"`
 		FfaOfDfa  string     `json:"ffa_of_dfa" bson:"ffa_of_dfa"`
-		FfaOfSpo  string     `json:"ffa_of_spo" bson:"ffa_of_spo"`
+		FfaOfSpo  string     `json:"k" bson:"ffa_of_spo"`
 	}
 	RefineryReport struct {
 		Shared         `bson:",inline"`

@@ -30,6 +30,7 @@ func NewService(conf *env.Environment) *Service {
 		AccountsService:       NewAccountsService(conf),
 		FractionationService:  NewFractionationService(conf),
 		QualityControlService: NewQualityControlService(),
+		RefineryService:       NewRefineryService(conf),
 		DeptService:           NewDeptService(),
 	}
 }

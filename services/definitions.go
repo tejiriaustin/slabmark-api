@@ -11,11 +11,6 @@ type (
 	AccountsServiceInterface interface {
 		CreateUser(ctx context.Context,
 			input AddAccountInput,
-			accountsRepo *repository.Repository[models.Account],
-		) (*models.Account, error)
-
-		AddAccount(ctx context.Context,
-			input AddAccountInput,
 			passwordGen utils.StrGenFunc,
 			accountsRepo *repository.Repository[models.Account],
 		) (*models.Account, error)

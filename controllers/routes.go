@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"github.com/tejiriaustin/slabmark-api/env"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,10 @@ func AddRoutes(
 	routerEngine *gin.Engine,
 	sc *services.Service,
 	repos *repository.Container,
+	conf *env.Environment,
 ) {
 
-	controllers := BuildNewController(ctx)
+	controllers := BuildNewController(ctx, conf)
 
 	passwordGenerator := utils.RandomStringGenerator()
 
@@ -32,7 +34,7 @@ func AddRoutes(
 	user := r.Group("/user")
 	{
 		// TODO: Remove this
-		user.POST("/signup", controllers.AccountsController.SignUp(sc.AccountsService, repos.AccountsRepo))
+		user.POST("/signup", controllers.AccountsController.SignUp(passwordGenerator, sc.AccountsService, repos.AccountsRepo))
 
 		user.POST("", controllers.AccountsController.AddAccount(passwordGenerator, sc.DeptService, sc.AccountsService, repos.AccountsRepo))
 		user.PUT("", controllers.AccountsController.EditAccount(sc.DeptService, sc.AccountsService, repos.AccountsRepo))
@@ -47,7 +49,7 @@ func AddRoutes(
 		fractionation.POST("", controllers.FractionationController.CreateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
 		fractionation.PUT("", controllers.FractionationController.UpdateFractionationRecord(sc.FractionationService, repos.FractionationRepo))
 		fractionation.GET("/:id", controllers.FractionationController.GetFractionationRecord(sc.FractionationService, repos.FractionationRepo))
-		fractionation.GET("/list", controllers.FractionationController.GetFractionationRecord(sc.FractionationService, repos.FractionationRepo))
+		fractionation.GET("/list", controllers.FractionationController.ListFractionationRecords(sc.FractionationService, repos.FractionationRepo))
 	}
 
 	refinery := r.Group("/refinery")

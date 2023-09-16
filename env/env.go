@@ -44,3 +44,14 @@ func (e Environment) GetAsString(key string) string {
 
 	return valueAsString
 }
+
+func (e Environment) GetAsBytes(key string) []byte {
+	value := e[key]
+
+	valueAsString, ok := value.(string)
+	if !ok {
+		return nil
+	}
+
+	return []byte(valueAsString)
+}

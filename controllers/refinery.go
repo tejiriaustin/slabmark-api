@@ -15,8 +15,10 @@ type RefineryController struct {
 	conf *env.Environment
 }
 
-func NewRefineryController() *RefineryController {
-	return &RefineryController{}
+func NewRefineryController(conf *env.Environment) *RefineryController {
+	return &RefineryController{
+		conf: conf,
+	}
 }
 
 func (c *RefineryController) CreateRefineryRecord(
@@ -25,7 +27,7 @@ func (c *RefineryController) CreateRefineryRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		accountInfo, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -35,7 +37,7 @@ func (c *RefineryController) CreateRefineryRecord(
 
 		err = ctx.BindJSON(&requestBody)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -47,7 +49,7 @@ func (c *RefineryController) CreateRefineryRecord(
 
 		record, err := refineryService.CreateRefineryRecord(ctx, input, refineryRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -68,7 +70,7 @@ func (c *RefineryController) GetRefineryRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -80,7 +82,7 @@ func (c *RefineryController) GetRefineryRecord(
 
 		record, err := refineryService.GetRefineryRecord(ctx, input, refineryRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -96,7 +98,7 @@ func (c *RefineryController) ListRefineryRecords(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -108,13 +110,13 @@ func (c *RefineryController) ListRefineryRecords(
 				PerPage: services.GetPerPageLimitFromContext(ctx),
 			},
 			Filters: services.RefineryListFilters{
-				Query: ctx.Param("query"),
+				Query: ctx.Query("query"),
 			},
 		}
 
 		records, paginator, err := refineryService.ListRefineryRecords(ctx, input, refineryRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 

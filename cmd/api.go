@@ -47,7 +47,7 @@ func startApi(cmd *cobra.Command, args []string) {
 
 	sc := services.NewService(&config)
 
-	server.Start(ctx, sc, rc)
+	server.Start(ctx, sc, rc, &config)
 
 }
 
@@ -60,7 +60,8 @@ func setApiEnvironment() env.Environment {
 		SetEnv(env.RedisPort, env.MustGetEnv(env.RedisPort)).
 		SetEnv(env.RedisPass, env.MustGetEnv(env.RedisPass)).
 		SetEnv(env.MongoDsn, env.MustGetEnv(env.MongoDsn)).
-		SetEnv(env.MongoDbName, env.MustGetEnv(env.MongoDbName))
+		SetEnv(env.MongoDbName, env.MustGetEnv(env.MongoDbName)).
+		SetEnv(env.JwtSecret, env.MustGetEnv(env.JwtSecret))
 
 	return staticEnvironment
 }

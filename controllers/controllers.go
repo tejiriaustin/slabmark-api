@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
+	"github.com/tejiriaustin/slabmark-api/services"
 	"net/http"
 )
 
@@ -19,12 +18,12 @@ type Controller struct {
 	RefineryController       *RefineryController
 }
 
-func BuildNewController(ctx context.Context) *Controller {
+func BuildNewController(ctx context.Context, conf *env.Environment) *Controller {
 	return &Controller{
-		AccountsController:       NewAccountController(),
-		QualityControlController: NewQualityControlController(),
-		FractionationController:  NewFractionationController(),
-		RefineryController:       NewRefineryController(),
+		AccountsController:       NewAccountController(conf),
+		QualityControlController: NewQualityControlController(conf),
+		FractionationController:  NewFractionationController(conf),
+		RefineryController:       NewRefineryController(conf),
 	}
 }
 
@@ -37,34 +36,22 @@ func (r *Controller) extractToken(ctx *gin.Context) {
 
 }
 
-func GetAccountInfo(ctx *gin.Context, jwtSecret string) (*models.AccountInfo, error) {
-	tokenString, err := GetCookieHandler(ctx)
+func GetAccountInfo(ctx *gin.Context, jwtSecret []byte) (*models.AccountInfo, error) {
+	tokenString, err := GetAuthHeader(ctx)
 	if err != nil {
 		return nil, err
 	}
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	claims := &services.Claims{}
 
-		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
-			return nil, fmt.Errorf("there's an error with the signing method")
-		}
+	_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 	if err != nil {
-		return nil, errors.New("error signing token")
+		return nil, err
 	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if ok && token.Valid {
-		accountInfo := claims["account_info"].(models.AccountInfo)
-		return &accountInfo, nil
-	}
-	return nil, fmt.Errorf("unable to get account")
+	return &claims.AccountInfo, nil
 }
 
-func GetCookieHandler(c *gin.Context) (string, error) {
-	cookie, err := c.Cookie("auth")
-	if err != nil {
-		return "", errors.New("cookie not found")
-	}
-	return cookie, nil
+func GetAuthHeader(c *gin.Context) (string, error) {
+	return c.GetHeader("x-token-user"), nil
 }

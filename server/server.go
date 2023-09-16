@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/middleware"
 	"log"
 	"os"
@@ -19,6 +20,7 @@ func Start(
 	ctx context.Context,
 	service *services.Service,
 	repo *repository.Container,
+	conf *env.Environment,
 ) {
 
 	router := gin.New()
@@ -29,7 +31,7 @@ func Start(
 	)
 	log.Println("starting server...")
 
-	controllers.AddRoutes(ctx, router, service, repo)
+	controllers.AddRoutes(ctx, router, service, repo, conf)
 
 	go func() {
 		if err := router.Run(); err != nil {

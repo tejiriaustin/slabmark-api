@@ -15,8 +15,10 @@ type QualityControlController struct {
 	conf *env.Environment
 }
 
-func NewQualityControlController() *QualityControlController {
-	return &QualityControlController{}
+func NewQualityControlController(conf *env.Environment) *QualityControlController {
+	return &QualityControlController{
+		conf: conf,
+	}
 }
 
 func (c *QualityControlController) CreateQualityControlRecord(
@@ -25,7 +27,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -35,7 +37,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 
 		err = ctx.BindJSON(&requestBody)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -47,7 +49,7 @@ func (c *QualityControlController) CreateQualityControlRecord(
 		}
 		record, err := qcService.CreateQualityRecord(ctx, input, qcDailyRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -68,7 +70,7 @@ func (c *QualityControlController) GetQualityRecord(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -80,7 +82,7 @@ func (c *QualityControlController) GetQualityRecord(
 
 		record, err := qcService.GetDailyQualityRecord(ctx, input, qcDailyRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -95,7 +97,7 @@ func (c *QualityControlController) ListQualityRecords(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -107,13 +109,13 @@ func (c *QualityControlController) ListQualityRecords(
 				PerPage: services.GetPerPageLimitFromContext(ctx),
 			},
 			Filters: services.QualityListFilters{
-				Query: ctx.Param("query"),
+				Query: ctx.Query("query"),
 			},
 		}
 
 		records, paginator, err := qcService.ListQualityRecords(ctx, input, qcDailyRepo)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 

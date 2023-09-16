@@ -18,11 +18,14 @@ type AccountsController struct {
 	conf *env.Environment
 }
 
-func NewAccountController() *AccountsController {
-	return &AccountsController{}
+func NewAccountController(conf *env.Environment) *AccountsController {
+	return &AccountsController{
+		conf: conf,
+	}
 }
 
 func (c *AccountsController) SignUp(
+	passwordGen utils.StrGenFunc,
 	acctService services.AccountsServiceInterface,
 	accountsRepo *repository.Repository[models.Account],
 ) gin.HandlerFunc {
@@ -44,7 +47,7 @@ func (c *AccountsController) SignUp(
 			Password:  req.Phone,
 		}
 
-		user, err := acctService.CreateUser(ctx, input, accountsRepo)
+		user, err := acctService.CreateUser(ctx, input, passwordGen, accountsRepo)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
@@ -64,7 +67,7 @@ func (c *AccountsController) Login(
 
 		err := ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -100,7 +103,7 @@ func (c *AccountsController) ForgotPassword(
 
 		err := ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -128,7 +131,7 @@ func (c *AccountsController) ResetPassword(
 
 		err := ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -170,7 +173,7 @@ func (c *AccountsController) AddAccount(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -180,7 +183,7 @@ func (c *AccountsController) AddAccount(
 
 		err = ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -196,7 +199,7 @@ func (c *AccountsController) AddAccount(
 			Department: req.Department,
 		}
 
-		user, err := acctService.AddAccount(ctx, input, passwordGen, accountsRepo)
+		user, err := acctService.CreateUser(ctx, input, passwordGen, accountsRepo)
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
@@ -213,7 +216,7 @@ func (c *AccountsController) EditAccount(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		_, err := GetAccountInfo(ctx, c.conf.GetAsString(env.JwtSecret))
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
 		if err != nil {
 			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
 			return
@@ -223,7 +226,7 @@ func (c *AccountsController) EditAccount(
 
 		err = ctx.BindJSON(&req)
 		if err != nil {
-			response.FormatResponse(ctx, http.StatusBadRequest, "Bad Request 1", nil)
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 

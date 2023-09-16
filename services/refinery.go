@@ -6,6 +6,8 @@ import (
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type RefineryService struct {
@@ -17,6 +19,8 @@ func NewRefineryService(conf *env.Environment) *RefineryService {
 		conf: conf,
 	}
 }
+
+var _ RefineryServiceInterface = (*RefineryService)(nil)
 
 type (
 	CreateRefineryInput struct {
@@ -54,7 +58,13 @@ func (r *RefineryService) CreateRefineryRecord(
 		return nil, errors.New("at least one hourly report is required")
 	}
 
+	now := time.Now()
+
 	record := models.RefineryReport{
+		Shared: models.Shared{
+			ID:        primitive.NewObjectID(),
+			CreatedAt: &now,
+		},
 		HourlyReports:  input.HourlyReport,
 		PlantSituation: input.PlantSituation,
 		AccountInfo:    input.AccountInfo,
@@ -101,14 +111,19 @@ func (r *RefineryService) UpdateRefineryRecord(
 func (r *RefineryService) GetRefineryRecord(
 	ctx context.Context,
 	input GetRefineryRecordInput,
-	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
-) (*models.DailyQualityReadings, error) {
+	refineryRepo *repository.Repository[models.RefineryReport],
+) (*models.RefineryReport, error) {
+
+	id, err := primitive.ObjectIDFromHex(input.ID)
+	if err != nil {
+		return nil, errors.New("invalid identifier")
+	}
 
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldId, input.ID)
+		AddFilter(models.FieldId, id)
 
-	report, err := dailyQualityRepo.FindOne(ctx, filter, nil, nil)
+	report, err := refineryRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +134,8 @@ func (r *RefineryService) GetRefineryRecord(
 func (r *RefineryService) ListRefineryRecords(
 	ctx context.Context,
 	input ListRefineryReportsInput,
-	dailyQualityRepo *repository.Repository[models.DailyQualityReadings],
-) ([]models.DailyQualityReadings, *repository.Paginator, error) {
+	refineryRepo *repository.Repository[models.RefineryReport],
+) ([]models.RefineryReport, *repository.Paginator, error) {
 
 	filter := repository.NewQueryFilter()
 
@@ -134,7 +149,7 @@ func (r *RefineryService) ListRefineryRecords(
 		filter.AddFilter("$or", freeHandFilters)
 	}
 
-	report, _, err := dailyQualityRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
+	report, _, err := refineryRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
 	if err != nil {
 		return nil, nil, err
 	}

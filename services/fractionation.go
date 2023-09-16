@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"errors"
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type FractionationService struct {
@@ -57,7 +59,13 @@ func (s *FractionationService) CreateFractionationRecord(
 	fractionationRepo *repository.Repository[models.FractionationReport],
 ) (*models.FractionationReport, error) {
 
+	now := time.Now()
+
 	report := models.FractionationReport{
+		Shared: models.Shared{
+			ID:        primitive.NewObjectID(),
+			CreatedAt: &now,
+		},
 		ResumptionStock: input.ResumptionStock,
 		ClosingStock:    input.ClosingStock,
 		Filtration:      input.Filtration,
@@ -107,9 +115,13 @@ func (s *FractionationService) GetFractionationRecord(
 	fractionationRepo *repository.Repository[models.FractionationReport],
 ) (*models.FractionationReport, error) {
 
+	id, err := primitive.ObjectIDFromHex(input.ID)
+	if err != nil {
+		return nil, errors.New("invalid identifier")
+	}
 	filter := repository.
 		NewQueryFilter().
-		AddFilter(models.FieldId, input.ID)
+		AddFilter(models.FieldId, id)
 
 	report, err := fractionationRepo.FindOne(ctx, filter, nil, nil)
 	if err != nil {
