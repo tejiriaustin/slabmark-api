@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"github.com/tejiriaustin/slabmark-api/env"
-	"github.com/tejiriaustin/slabmark-api/middleware"
 	"log"
 	"os"
 	"os/signal"
@@ -12,6 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/tejiriaustin/slabmark-api/controllers"
+	"github.com/tejiriaustin/slabmark-api/env"
+	"github.com/tejiriaustin/slabmark-api/middleware"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/services"
 )
@@ -28,6 +28,7 @@ func Start(
 	router.Use(
 		middleware.DefaultStructuredLogs(),
 		middleware.ReadPaginationOptions(),
+		middleware.CORSMiddleware(),
 	)
 	log.Println("starting server...")
 
