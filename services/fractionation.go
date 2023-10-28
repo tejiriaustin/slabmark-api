@@ -3,11 +3,13 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 type FractionationService struct {

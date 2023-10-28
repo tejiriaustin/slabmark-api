@@ -6,6 +6,10 @@ import (
 	"log"
 )
 
+var (
+	SubscriptionChannel = "SUBSCRIPTION_CHANNEL"
+)
+
 type RedisClient struct {
 	rdb *redis.Client
 }
@@ -29,11 +33,11 @@ func NewRedisClient(dsn, password, port string) (*RedisClient, error) {
 	}, nil
 }
 
-func (rdb RedisClient) Set(ctx context.Context, key string, value interface{}) error {
+func (rdb *RedisClient) Set(ctx context.Context, key string, value interface{}) error {
 	return rdb.rdb.Set(ctx, key, value, 0).Err()
 }
 
-func (rdb RedisClient) Get(ctx context.Context, key string) (string, error) {
+func (rdb *RedisClient) Get(ctx context.Context, key string) (string, error) {
 	val, err := rdb.rdb.Get(ctx, key).Result()
 	if err != nil {
 		return "", err
@@ -41,10 +45,18 @@ func (rdb RedisClient) Get(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 
-func (rdb RedisClient) Disconnect(ctx context.Context) error {
+func (rdb *RedisClient) Disconnect(ctx context.Context) error {
 	err := rdb.rdb.Close()
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (rdb *RedisClient) Subscribe(ctx context.Context) *redis.PubSub {
+	return rdb.rdb.Subscribe(ctx, SubscriptionChannel)
+}
+
+func (rdb *RedisClient) Publish(ctx context.Context, key string, msg map[string]interface{}) error {
+	return rdb.rdb.Publish(ctx, key, msg).Err()
 }

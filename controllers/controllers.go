@@ -2,21 +2,26 @@ package controllers
 
 import (
 	"context"
+	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/services"
-	"net/http"
 )
 
-type Controller struct {
-	conf                     *env.Environment
-	AccountsController       *AccountsController
-	QualityControlController *QualityControlController
-	FractionationController  *FractionationController
-	RefineryController       *RefineryController
-}
+type (
+	Controller struct {
+		conf                     *env.Environment
+		AccountsController       *AccountsController
+		QualityControlController *QualityControlController
+		FractionationController  *FractionationController
+		RefineryController       *RefineryController
+	}
+)
 
 func BuildNewController(ctx context.Context, conf *env.Environment) *Controller {
 	return &Controller{
@@ -32,14 +37,10 @@ func (r *Controller) SetCookieHandlers(c *gin.Context, token string) {
 	c.String(http.StatusOK, "Cookie has been set")
 }
 
-func (r *Controller) extractToken(ctx *gin.Context) {
-
-}
-
 func GetAccountInfo(ctx *gin.Context, jwtSecret []byte) (*models.AccountInfo, error) {
 	tokenString, err := GetAuthHeader(ctx)
-	if err != nil {
-		return nil, err
+	if tokenString != "" {
+		return nil, errors.New("token not set")
 	}
 	claims := &services.Claims{}
 
@@ -49,6 +50,7 @@ func GetAccountInfo(ctx *gin.Context, jwtSecret []byte) (*models.AccountInfo, er
 	if err != nil {
 		return nil, err
 	}
+
 	return &claims.AccountInfo, nil
 }
 

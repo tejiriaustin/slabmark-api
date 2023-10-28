@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/utils"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type AccountsService struct {
@@ -58,50 +60,17 @@ type (
 		AccountInfo   models.AccountInfo
 		jwt.StandardClaims
 	}
-)
+	AccountListFilters struct {
+		Query string // for partial free hand lookups
+	}
 
-//func (s *AccountsService) CreateUser(ctx context.Context,
-//	input AddAccountInput,
-//	accountsRepo *repository.Repository[models.Account],
-//) (*models.Account, error) {
-//
-//	filters := []map[string]interface{}{
-//		{"email": input.Email},
-//		{"phone": input.Phone},
-//	}
-//
-//	qf := repository.NewQueryFilter().AddFilter("$or", filters)
-//	matchedUser, err := accountsRepo.FindOne(ctx, qf, nil, nil)
-//	if err != nil && err != repository.NoDocumentsFound {
-//		return nil, err
-//	}
-//	if matchedUser.Email == input.Email {
-//		return nil, errors.New("user with this email already exists")
-//	}
-//	if matchedUser.Phone == input.Phone {
-//		return nil, errors.New("user with this phone number already exists")
-//	}
-//
-//	account := models.Account{
-//		Shared: models.Shared{
-//			ID:        primitive.NewObjectID(),
-//			CreatedAt: &now,
-//		},
-//		FirstName: input.FirstName,
-//		LastName:  input.LastName,
-//		Phone:     input.Phone,
-//		Email:     input.Email,
-//		Status:    "ACTIVE",
-//		Password:  input.Password,
-//	}
-//	account.FullName = account.GetFullName()
-//	account.Username = account.GetUsername()
-//	_, err = accountsRepo.Create(ctx, account)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return &account, nil
-//}
+	ListAccountReportsInput struct {
+		Pager
+		Projection *repository.QueryProjection
+		Sort       *repository.QuerySort
+		Filters    AccountListFilters
+	}
+)
 
 func (s *AccountsService) CreateUser(ctx context.Context,
 	input AddAccountInput,
@@ -289,4 +258,31 @@ func (s *AccountsService) ResetPassword(ctx context.Context,
 	}
 
 	return &account, nil
+}
+
+func (s *AccountsService) ListAccounts(ctx context.Context,
+	input ListAccountReportsInput,
+	accountsRepo *repository.Repository[models.Account],
+) ([]models.Account, *repository.Paginator, error) {
+
+	filter := repository.NewQueryFilter()
+
+	if input.Filters.Query != "" {
+		freeHandFilters := []map[string]interface{}{
+			{"first_name": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"last_name": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"full_name": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"phone": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"email": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+			{"username": map[string]interface{}{"$regex": input.Filters.Query, "$options": "i"}},
+		}
+		filter.AddFilter("$or", freeHandFilters)
+	}
+
+	account, paginator, err := accountsRepo.Paginate(ctx, filter, input.PerPage, input.Page, input.Projection, input.Sort)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return account, paginator, nil
 }

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"github.com/tejiriaustin/slabmark-api/env"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/tejiriaustin/slabmark-api/env"
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/requests"
@@ -53,7 +53,7 @@ func (c *AccountsController) SignUp(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
 	}
 }
 
@@ -82,7 +82,7 @@ func (c *AccountsController) Login(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
 	}
 }
 
@@ -117,7 +117,7 @@ func (c *AccountsController) ForgotPassword(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
 	}
 }
 
@@ -146,7 +146,7 @@ func (c *AccountsController) ResetPassword(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
 	}
 }
 
@@ -205,7 +205,7 @@ func (c *AccountsController) AddAccount(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
 	}
 }
 
@@ -248,6 +248,49 @@ func (c *AccountsController) EditAccount(
 			return
 		}
 
-		response.FormatResponse(ctx, http.StatusOK, "successful", user)
+		response.FormatResponse(ctx, http.StatusOK, "successful", response.SingleAccountResponse(user))
+	}
+}
+func (c *AccountsController) ListAccounts(
+	acctService services.AccountsServiceInterface,
+	accountsRepo *repository.Repository[models.Account],
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		_, err := GetAccountInfo(ctx, c.conf.GetAsBytes(env.JwtSecret))
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusUnauthorized, "Unauthorized access", nil)
+			return
+		}
+
+		var req requests.ListAccountsRequest
+
+		err = ctx.BindJSON(&req)
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
+			return
+		}
+
+		input := services.ListAccountReportsInput{
+			Pager: services.Pager{
+				Page:    services.GetPageNumberFromContext(ctx),
+				PerPage: services.GetPerPageLimitFromContext(ctx),
+			},
+			Filters: services.AccountListFilters{
+				Query: ctx.Param("query"),
+			},
+		}
+		accounts, paginator, err := acctService.ListAccounts(ctx, input, accountsRepo)
+		if err != nil {
+			response.FormatResponse(ctx, http.StatusBadRequest, err.Error(), nil)
+			return
+		}
+
+		payload := map[string]interface{}{
+			"records": response.MultipleAccountResponse(accounts),
+			"meta":    paginator,
+		}
+
+		response.FormatResponse(ctx, http.StatusOK, "successful", payload)
 	}
 }

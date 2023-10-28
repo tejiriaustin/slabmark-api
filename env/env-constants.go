@@ -22,4 +22,8 @@ const (
 	MONGO_DB_USERNAME = "MONGO_DB_USERNAME"
 
 	MONGO_DB_PASSWORD = "MONGO_DB_PASSWORD"
+
+	MailjetApikeyPublic = "MAILJET_APIKEY_PUBLIC"
+
+	MailjetApikeyPrivate = "MJ_APIKEY_PRIVATE"
 )

@@ -1,24 +1,26 @@
 package response
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "github.com/tejiriaustin/slabmark-api/models"
 
-type Response struct {
-	Message string      `json:"message,omitempty"`
-	Body    interface{} `json:"body,omitempty"`
-}
-
-func respond(ctx *gin.Context, code int, response Response) {
-	ctx.JSONP(code, response)
-}
-
-func FormatResponse(ctx *gin.Context, code int, message string, body interface{}) {
-	response := Response{}
-	if body != nil {
-		response.Body = body
+func SingleAccountResponse(account *models.Account) map[string]interface{} {
+	return map[string]interface{}{
+		"email":      account.Email,
+		"password":   account.Password,
+		"firstName":  account.FirstName,
+		"lastName":   account.LastName,
+		"username":   account.Username,
+		"fullName":   account.FullName,
+		"phone":      account.Phone,
+		"department": account.Department,
+		"status":     account.Status,
+		"token":      account.Token,
 	}
-	response.Message = message
+}
 
-	respond(ctx, code, response)
+func MultipleAccountResponse(accounts []models.Account) interface{} {
+	m := make([]map[string]interface{}, 0, len(accounts))
+	for _, a := range accounts {
+		m = append(m, SingleAccountResponse(&a))
+	}
+	return m
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/tejiriaustin/slabmark-api/models"
 	"github.com/tejiriaustin/slabmark-api/repository"
 	"github.com/tejiriaustin/slabmark-api/requests"
-	"github.com/tejiriaustin/slabmark-api/response"
 	"github.com/tejiriaustin/slabmark-api/services"
 )
 

@@ -13,12 +13,18 @@ import (
 	"time"
 )
 
-type Container struct {
-	AccountsRepo      *Repository[models.Account]
-	FractionationRepo *Repository[models.FractionationReport]
-	RefineryRepo      *Repository[models.RefineryReport]
-	QualityRepo       *Repository[models.DailyQualityReadings]
-}
+type (
+	Container struct {
+		AccountsRepo      *Repository[models.Account]
+		FractionationRepo *Repository[models.FractionationReport]
+		RefineryRepo      *Repository[models.RefineryReport]
+		QualityRepo       *Repository[models.DailyQualityReadings]
+		ActivityRepo      *Repository[models.Activity]
+	}
+	Repository[T models.SharedInterface] struct {
+		dbCollection database.Collection
+	}
+)
 
 func NewRepositoryContainer(dbConn *database.Client) *Container {
 	log.Println(" building repository container...")
@@ -28,11 +34,8 @@ func NewRepositoryContainer(dbConn *database.Client) *Container {
 		FractionationRepo: NewRepository[models.FractionationReport](dbConn.GetCollection("fractionation_reports")),
 		RefineryRepo:      NewRepository[models.RefineryReport](dbConn.GetCollection("daily_refinery_reports")),
 		QualityRepo:       NewRepository[models.DailyQualityReadings](dbConn.GetCollection("daily_quality_reports")),
+		ActivityRepo:      NewRepository[models.Activity](dbConn.GetCollection("activity_reports")),
 	}
-}
-
-type Repository[T models.SharedInterface] struct {
-	dbCollection database.Collection
 }
 
 func NewRepository[T models.SharedInterface](dbCollection database.Collection) *Repository[T] {

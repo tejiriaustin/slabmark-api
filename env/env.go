@@ -1,9 +1,10 @@
 package env
 
 import (
-	"github.com/joho/godotenv"
 	"log"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 type Environment map[string]interface{}

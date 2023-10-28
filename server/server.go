@@ -18,7 +18,7 @@ import (
 
 func Start(
 	ctx context.Context,
-	service *services.Service,
+	service *services.Container,
 	repo *repository.Container,
 	conf *env.Environment,
 ) {

@@ -34,6 +34,11 @@ type (
 			input ResetPasswordInput,
 			accountsRepo *repository.Repository[models.Account],
 		) (*models.Account, error)
+
+		ListAccounts(ctx context.Context,
+			input ListAccountReportsInput,
+			accountsRepo *repository.Repository[models.Account],
+		) ([]models.Account, *repository.Paginator, error)
 	}
 
 	FractionationServiceInterface interface {
@@ -106,5 +111,13 @@ type (
 			input ListRefineryReportsInput,
 			refineryRepo *repository.Repository[models.RefineryReport],
 		) ([]models.RefineryReport, *repository.Paginator, error)
+	}
+
+	ActivityServiceInterface interface {
+		ListActivities(
+			ctx context.Context,
+			input ListActivityInput,
+			activityRepo *repository.Repository[models.Activity],
+		) ([]models.Activity, *repository.Paginator, error)
 	}
 )

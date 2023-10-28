@@ -27,6 +27,14 @@ type (
 		Phone      string `json:"phone"`
 	}
 
+	ListAccountFilters struct {
+		AccountID string `json:"account_id"`
+		Name      string `json:"name"`
+	}
+	ListAccountsRequest struct {
+		Filters ListAccountFilters
+	}
+
 	LoginUserRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -58,13 +66,17 @@ type (
 	}
 	ListFractionationRecordRequest struct {
 	}
+)
 
+type (
 	CreateQualityRecordRequest struct {
 		ProductCode    string                         `json:"product_code"`
 		OverallRemark  string                         `json:"overall_remark"`
 		HourlyReadings []models.HourlyQualityReadings `json:"hourly_readings"`
 	}
+)
 
+type (
 	CreateRefineryRecordRequest struct {
 		PlantSituation string                `json:"plant_situation"`
 		HourlyReports  []models.HourlyReport `json:"hourly_reports"`

@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	Service struct {
+	Container struct {
 		AccountsService       AccountsServiceInterface
 		DeptService           DepartmentsServiceInterface
 		RefineryService       RefineryServiceInterface
@@ -24,9 +24,9 @@ type (
 	}
 )
 
-func NewService(conf *env.Environment) *Service {
-	log.Println("Creating Service...")
-	return &Service{
+func NewService(conf *env.Environment) *Container {
+	log.Println("Creating Container...")
+	return &Container{
 		AccountsService:       NewAccountsService(conf),
 		FractionationService:  NewFractionationService(conf),
 		QualityControlService: NewQualityControlService(),

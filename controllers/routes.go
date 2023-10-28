@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/tejiriaustin/slabmark-api/repository"
-	"github.com/tejiriaustin/slabmark-api/response"
 	"github.com/tejiriaustin/slabmark-api/services"
 	"github.com/tejiriaustin/slabmark-api/utils"
 )
@@ -16,7 +15,7 @@ import (
 func AddRoutes(
 	ctx context.Context,
 	routerEngine *gin.Engine,
-	sc *services.Service,
+	sc *services.Container,
 	repos *repository.Container,
 	conf *env.Environment,
 ) {
@@ -33,14 +32,12 @@ func AddRoutes(
 
 	user := r.Group("/user")
 	{
-		// TODO: Remove this
-		user.POST("/signup", controllers.AccountsController.SignUp(passwordGenerator, sc.AccountsService, repos.AccountsRepo))
-
 		user.POST("", controllers.AccountsController.AddAccount(passwordGenerator, sc.DeptService, sc.AccountsService, repos.AccountsRepo))
 		user.PUT("", controllers.AccountsController.EditAccount(sc.DeptService, sc.AccountsService, repos.AccountsRepo))
 		user.POST("/login", controllers.AccountsController.Login(sc.AccountsService, repos.AccountsRepo))
 		user.POST("/forgot-password", controllers.AccountsController.ForgotPassword(sc.AccountsService, repos.AccountsRepo))
-		user.POST("/reset", controllers.AccountsController.ResetPassword(sc.AccountsService, repos.AccountsRepo))
+		user.POST("/reset-password", controllers.AccountsController.ResetPassword(sc.AccountsService, repos.AccountsRepo))
+		user.GET("/")
 		user.GET("/roles", controllers.AccountsController.GetRoles(sc.DeptService))
 	}
 
